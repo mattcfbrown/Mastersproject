@@ -3,6 +3,12 @@
 params.count = "$projectDir/Data/Test2.txt"
 params.outdir = "results"
 
+
+workflow {
+    test_ch = NLNET(params.count)
+    test_ch.view()
+}
+
 process INFORMATION_MEASURES {
 
     input:
@@ -28,18 +34,14 @@ process NLNET {
 
     input:
     path count
+    path script
 
     output:
     path 'matrix.txt'
 
     script:
     """
-    Rscript $projectDir/R_programs/NLENT.R
+    Rscript ${script}
 
     """
-}
-
-workflow {
-    test_ch = NLNET(params.count)
-    test_ch.view()
 }
