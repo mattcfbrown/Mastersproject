@@ -1,16 +1,17 @@
 #Load up the library
 library(nlnet)
 
-#Sets the directory
-setwd("/Users/mbrown/Desktop/Research/NLNET")
+args <- commandArgs(trailingOnly = TRUE)
+
+print(args)
 
 #Now get an example matrix
-x <- data.gen(n.genes = 30, n.samples = 400)
+#x <- data.gen(n.genes = 30, n.samples = 400)
 
-nlnet(x[["data"]])
+#nlnet(x[["data"]])
 
-mat <- read.table('Test2.txt', header = FALSE, sep = '\t')
+#mat <- read.table('Test2.txt', header = FALSE, sep = '\t')
 
-mat_convert = data.matrix(mat)
+#mat_convert = data.matrix(mat)
 
-nlnet(mat_convert)
+#nlnet(mat_convert)

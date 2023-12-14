@@ -2,3 +2,5 @@
 work/
 .nextflow/
 .nextflow.log*
+Data/expr_mat_small.loom
+Loom_practice/
