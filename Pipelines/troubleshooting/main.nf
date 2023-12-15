@@ -95,7 +95,7 @@ process EMPIRICAL_BAYES {
 
 process SCENIC {
 
-    container 'camaralab/scenic:latest'
+    container 'aertslab/pyscenic:0.9.18'
     
     input:
     path grn
