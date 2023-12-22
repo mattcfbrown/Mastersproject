@@ -4,3 +4,4 @@ work/
 .nextflow.log*
 Data/expr_mat_small.loom
 Loom_practice/
+Julia_programs/

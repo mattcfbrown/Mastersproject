@@ -5,6 +5,7 @@ nlnet_rscript  = file( params.nlnet_rscript )
 NI_script      = file( params.NI_script )
 EB_script      = file( params.EB_script )
 count_matrix   = file( params.count_data )
+count_EB       = file( params.EB_count )
 SCENIC_test    = file( params.test_SC)
 SCENIC_matrix  = file( params.matrix)
 Trans_fact     = file( params.TFs)
@@ -20,7 +21,7 @@ workflow {
     //).view()
     //Empirical Bayes method for network inference
     EMPIRICAL_BAYES(
-        count_matrix,
+        count_EB,
         EB_script
     ).view()
     //nlnet method for network inference
