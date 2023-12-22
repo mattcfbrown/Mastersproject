@@ -7,29 +7,31 @@ EB_script      = file( params.EB_script )
 count_matrix   = file( params.count_data )
 SCENIC_test    = file( params.test_SC)
 SCENIC_matrix  = file( params.matrix)
-Trans_fact     = file ( params.TFs)
+Trans_fact     = file( params.TFs)
+Network        = file( params.network)
 
 workflow {
     //PIDC METHOD FOR NETWORK INFERENCE
     //INFORMATION_MEASURES(
     //    count_matrix,
     //    NI_script,
-    //    0.15
+    //    0.15,
+    //    Network
     //).view()
     //Empirical Bayes method for network inference
-    //EMPIRICAL_BAYES(
-    //    count_matrix,
-    //    EB_script
-    //).view()
+    EMPIRICAL_BAYES(
+        count_matrix,
+        EB_script
+    ).view()
     //nlnet method for network inference
     //NLNET(
     //    count_matrix,
     //    nlnet_rscript
     //).view()
-    SCENIC(
-        SCENIC_matrix,
-        Trans_fact
-    ).view()    
+    //SCENIC(
+    //    SCENIC_matrix,
+    //    Trans_fact
+    //).view()    
 
 }
 
@@ -54,11 +56,13 @@ process NLNET {
 process INFORMATION_MEASURES {
 
     container 'networkinference:latest'
+    publishDir "${params.outdir}/Information_Measures"
 
     input:
     path infile
     path jlscript
     val threshold
+    path network
 
     output:
     path 'outfile_NI.txt'
@@ -67,7 +71,7 @@ process INFORMATION_MEASURES {
 
     """
 
-    julia ${jlscript} ${infile} ${threshold} > outfile_NI.txt
+    julia ${jlscript} ${infile} ${threshold} ${network} > outfile_NI.txt
 
     """
 
@@ -108,7 +112,7 @@ process SCENIC {
 
     """
     
-    pyscenic grn ${grn} ${TF} > outfile.loom
+    pyscenic grn ${grn} ${TF} -o outfile.loom
 
     """
 }

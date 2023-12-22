@@ -1,9 +1,15 @@
-FROM "rocker/r-base"
+FROM julia:1.9-buster
 
 LABEL image.author.name "Matthew Brown"
 LABEL image.author.email "brownmc@student.unimelb.edu.au"
 
-#RUN R -e "install.packages('igraph',dependencies=TRUE, repos='http://cran.rstudio.com/')"
-RUN R -e "install.packages('nlnet',dependencies=TRUE, repos='http://cran.rstudio.com/')"
+RUN apt-get update && apt-get install -y procps
 
-ENV PATH=$PATH:/usr/games/
+RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
+    julia -e 'using Pkg; Pkg.update(); Pkg.add("Adapt"); Pkg.precompile();'
+
+RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
+    julia -e 'using Pkg; Pkg.update(); Pkg.add("NetworkInference"); Pkg.precompile();'
+
+RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
+    julia -e 'using Pkg; Pkg.update(); Pkg.add(url="https://github.com/ananth-pallaseni/EmpiricalBayes.jl"); Pkg.precompile();'
