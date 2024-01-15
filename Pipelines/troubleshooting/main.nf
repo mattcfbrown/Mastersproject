@@ -10,25 +10,26 @@ SCENIC_test    = file( params.test_SC)
 SCENIC_matrix  = file( params.matrix)
 Trans_fact     = file( params.TFs)
 Network        = file( params.network)
+Original       = file( params.original)
 
 workflow {
     //PIDC METHOD FOR NETWORK INFERENCE
     //INFORMATION_MEASURES(
-    //    count_matrix,
+    //    Original,
     //    NI_script,
     //    0.15,
     //    Network
     //).view()
     //Empirical Bayes method for network inference
-    EMPIRICAL_BAYES(
-        count_EB,
-        EB_script
-    ).view()
-    //nlnet method for network inference
-    //NLNET(
-    //    count_matrix,
-    //    nlnet_rscript
+    //EMPIRICAL_BAYES(
+    //    count_EB,
+    //    EB_script
     //).view()
+    //nlnet method for network inference
+    NLNET(
+        count_matrix,
+        nlnet_rscript
+    ).view()
     //SCENIC(
     //    SCENIC_matrix,
     //    Trans_fact
@@ -50,7 +51,7 @@ process NLNET {
 
     script:
     """
-    Rscript ${rscript} ${infile}
+    Rscript ${rscript} ${infile} > outfile_nlnet.txt
     """
 }
 
@@ -101,6 +102,7 @@ process EMPIRICAL_BAYES {
 process SCENIC {
 
     container 'aertslab/pyscenic:0.9.18'
+    publishDir "${params.outdir}/SCENIC"
     
     input:
     path grn

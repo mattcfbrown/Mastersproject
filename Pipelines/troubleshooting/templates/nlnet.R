@@ -14,4 +14,13 @@ mat <- read.table(args, header = FALSE, sep = '\t')
 
 data_matrix = data.matrix(mat)
 
-nlnet(data_matrix)
+test <- nlnet(data_matrix)
+
+num_genes = length(test$graph)
+values <- c()
+for (x in 1:num_genes){
+  values <- append(values,test$graph[x])
+}
+
+adjacency <- matrix(values,nrow=num_genes,ncol = num_genes)
+adjacency
