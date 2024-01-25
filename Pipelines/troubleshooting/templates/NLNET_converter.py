@@ -2,10 +2,12 @@
 
 import numpy as np
 import itertools
+import sys
 
-file = open('/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/troubleshooting/results/nlnet/outfile_nlnet copy.txt', 'r')
+file = open(sys.argv[1], 'r')
 
-num_genes = 25
+num_genes = sys.argv[2]
+num_genes = int(num_genes)
 
 data = []
 #Extracts the raw matrix file
@@ -31,4 +33,4 @@ for i in range(int(len(data)/split)):
     cur_row = []
 
 a_matrix = np.array(rows)
-print(a_matrix)
+np.savetxt("matrix_nlnet.csv", a_matrix.astype(int), delimiter=",")
