@@ -14,16 +14,32 @@ Original       = file( params.original)
 nlenet_con_scr = file( params.nlnet_convert)
 original_mat   = file( params.original_mat)
 metric_program = file( params.metric)
+NI_con_scr     = file( params.NI_convert)
+file_correct   = file( params.input_fix)
 
 
 workflow {
     //PIDC METHOD FOR NETWORK INFERENCE
-    //INFORMATION_MEASURES(
-    //    Original,
-    //    NI_script,
-    //    0.15,
-    //    Network
-    //).view()
+    //STEP 1: Put the data into a readable format
+    corrected_matrix = INPUT_INFORMATION_MEASURES(
+        count_matrix,
+        file_correct
+    )
+
+    //STEP 2: Perform the algorithm
+    output_NI = INFORMATION_MEASURES(
+        corrected_matrix,
+        NI_script,
+        0.15
+    )
+
+    //STEP 3: Convert it into a useable form
+    ni_matrix = NI_CONVERSION(
+        output_NI,
+        NI_con_scr,
+        25
+    )
+
     //Empirical Bayes method for network inference
     //EMPIRICAL_BAYES(
     //    count_EB,
@@ -46,6 +62,7 @@ workflow {
     //NOTE, I WILL CONTINUE TO UPDATE THIS COMMAND AS I GET ALL THE RESULTS IN
     METRICS(
         nlnet_matrix,
+        ni_matrix,
         original_mat,
         metric_program
     ).view()
@@ -95,6 +112,24 @@ process NLNET_CONVERSION {
 
 }
 
+process INPUT_INFORMATION_MEASURES {
+
+    publishDir "${params.outdir}/Information_Measures"
+
+    input:
+    path infile
+    path script
+
+    output:
+    path 'formatted_data.txt'
+
+    script:
+
+    """
+    python3 ${script} ${infile} > formatted_data.txt
+    """
+}
+
 process INFORMATION_MEASURES {
 
     container 'networkinference:latest'
@@ -104,7 +139,6 @@ process INFORMATION_MEASURES {
     path infile
     path jlscript
     val threshold
-    path network
 
     output:
     path 'outfile_NI.txt'
@@ -113,10 +147,29 @@ process INFORMATION_MEASURES {
 
     """
 
-    julia ${jlscript} ${infile} ${threshold} ${network} > outfile_NI.txt
+    julia ${jlscript} ${infile} ${threshold} > outfile_NI.txt
 
     """
 
+}
+
+process NI_CONVERSION {
+
+    container 'nlnet_convert:latest'
+    publishDir "${params.outdir}/Information_Measures"
+
+    input:
+    path output_NI
+    path NI_converter
+    val num_genes
+
+    output:
+    path 'matrix_NI.csv'
+
+    script:
+    """
+    python3 ${NI_converter} ${output_NI} ${num_genes} > matrix_NI.csv
+    """
 }
 
 process EMPIRICAL_BAYES {
@@ -168,6 +221,7 @@ process METRICS {
 
     input:
     path nlnet_matrix
+    path ni_matrix
     path original_matrix
     path metric_script
 
@@ -177,7 +231,7 @@ process METRICS {
     script:
 
     """
-    python3 ${metric_script} ${nlnet_matrix} ${original_matrix} > ROCplot.pdf
+    python3 ${metric_script} ${nlnet_matrix} ${ni_matrix} ${original_matrix} > ROCplot.pdf
     """    
 
 }
