@@ -1,4 +1,9 @@
-FROM python:3.10
+FROM "rocker/r-base"
 
-RUN pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir numpy scipy scikit-learn matplotlib
+LABEL image.author.name "Matthew Brown"
+LABEL image.author.email "brownmc@student.unimelb.edu.au"
+
+RUN Rscript -e 'install.packages("BiocManager")'
+RUN Rscript -e 'BiocManager::install("GENIE3")'
+
+ENV PATH=$PATH:/usr/games/

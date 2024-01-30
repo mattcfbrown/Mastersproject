@@ -1,24 +1,23 @@
 #Load up the library
 library(GENIE3)
-
 set.seed(123)
 
-#Sets the directory
-setwd("/Users/mbrown/Desktop/Research/GENIE3")
+args = commandArgs(trailingOnly = TRUE)
 
-mat <- read.matrix('Test3.txt', header = FALSE, sep = '\t')
-mat_df<-data.frame(mat)
-apply(as.matrix.noquote(mat_df),2,as.numeric)
+#Reads in the data
+mat <- read.table(args[1], header = FALSE, sep = '\t')
+num_gene <- nrow(mat)
 
-rownames(mat) <- paste("Gene", 1:25, sep="")
-colnames(mat) <- paste("Sample", 1:2000, sep="")
-head(mat_df)
+#Gives the names needed
+rownames(mat) <- paste("Gene", 1:num_gene, sep="")
+colnames(mat) <- paste("Sample", 1:ncol(mat), sep="")
 
+#Converts mat into a data matrix
 mat <- data.matrix(mat)
-class(mat)
 
+#Performs the GENIE3 algorithm
 weightMat <- GENIE3(mat)
-
 linklist <- getLinkList(weightMat)
+linkList_threshold <- getLinkList(weightMat, threshold=args[2])
 
-linkList_threshold <- getLinkList(weightMat, threshold=0.1)
+print(linklist_threshold)

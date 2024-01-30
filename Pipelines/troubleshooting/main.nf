@@ -16,29 +16,30 @@ original_mat   = file( params.original_mat)
 metric_program = file( params.metric)
 NI_con_scr     = file( params.NI_convert)
 file_correct   = file( params.input_fix)
+genie_script   = file( params.genie3_rscript)
 
 
 workflow {
     //PIDC METHOD FOR NETWORK INFERENCE
     //STEP 1: Put the data into a readable format
-    corrected_matrix = INPUT_INFORMATION_MEASURES(
-        count_matrix,
-        file_correct
-    )
+    //corrected_matrix = INPUT_INFORMATION_MEASURES(
+    //    count_matrix,
+    //    file_correct
+    //)
 
     //STEP 2: Perform the algorithm
-    output_NI = INFORMATION_MEASURES(
-        corrected_matrix,
-        NI_script,
-        0.15
-    )
+    //output_NI = INFORMATION_MEASURES(
+    //    corrected_matrix,
+    //    NI_script,
+    //    0.15
+    //)
 
     //STEP 3: Convert it into a useable form
-    ni_matrix = NI_CONVERSION(
-        output_NI,
-        NI_con_scr,
-        25
-    )
+    //ni_matrix = NI_CONVERSION(
+    //    output_NI,
+    //    NI_con_scr,
+    //    25
+    //)
 
     //Empirical Bayes method for network inference
     //EMPIRICAL_BAYES(
@@ -48,29 +49,36 @@ workflow {
 
     //nlnet method for network inference
     //Firstly get the output needed
-    output_nlnet = NLNET(
-        count_matrix,
-        nlnet_rscript
-    )
+    //output_nlnet = NLNET(
+    //    count_matrix,
+    //    nlnet_rscript
+    //)
     //Now get it into a readable version
-    nlnet_matrix = NLNET_CONVERSION (
-        output_nlnet,
-        nlenet_con_scr,
-        25
-    )
+    //nlnet_matrix = NLNET_CONVERSION (
+    //    output_nlnet,
+    //    nlenet_con_scr,
+    //    25
+    //)
     //Now compare to the actual matrix
     //NOTE, I WILL CONTINUE TO UPDATE THIS COMMAND AS I GET ALL THE RESULTS IN
-    METRICS(
-        nlnet_matrix,
-        ni_matrix,
-        original_mat,
-        metric_program
-    ).view()
+    //METRICS(
+    //    nlnet_matrix,
+    //    ni_matrix,
+    //    original_mat,
+    //    metric_program
+    //).view()
 
     //SCENIC(
     //    SCENIC_matrix,
     //    Trans_fact
-    //).view()    
+    //).view()
+
+    //GENIE3 Method
+    GENIE3(
+        count_matrix,
+        genie_script,
+        0.1
+    ).view()    
 
 }
 
@@ -170,6 +178,27 @@ process NI_CONVERSION {
     """
     python3 ${NI_converter} ${output_NI} ${num_genes} > matrix_NI.csv
     """
+}
+
+process GENIE3 {
+
+    container 'genie3:latest'
+    publishDir "${params.outdir}/genie3"
+
+    input:
+    path infile
+    path genie_script
+    val threshold
+
+    output:
+    path 'genie.txt'
+
+    script:
+
+    """
+    Rscript ${genie_script} ${infile} ${threshold} > genie.txt
+    """
+
 }
 
 process EMPIRICAL_BAYES {
