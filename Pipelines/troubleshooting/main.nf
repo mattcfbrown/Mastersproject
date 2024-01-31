@@ -19,6 +19,27 @@ file_correct   = file( params.input_fix)
 genie_script   = file( params.genie3_rscript)
 
 
+
+// workflow SUBWORKFLOW {
+//     // the inputs of this subworkflow
+//     take: 
+//     path count_data
+//     path script
+
+//     // yuour nextflow processes
+//     run:
+//     MYPROCESS(
+//         count_data,
+//         script
+//     )
+
+//     // the outputs of this subworkflow
+//     emit: 
+//     path MYPROCESS.outfile 
+// }
+
+
+
 workflow {
     //PIDC METHOD FOR NETWORK INFERENCE
     //STEP 1: Put the data into a readable format

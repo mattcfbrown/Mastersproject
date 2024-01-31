@@ -2,10 +2,13 @@
 library(GENIE3)
 set.seed(123)
 
+# assign variables from command line
 args = commandArgs(trailingOnly = TRUE)
+infile = args[1]
+threshold = as.numeric(args[2])
 
 #Reads in the data
-mat <- read.table(args[1], header = FALSE, sep = '\t')
+mat <- read.table(infile, header = FALSE, sep = '\t')
 num_gene <- nrow(mat)
 
 #Gives the names needed
@@ -18,6 +21,6 @@ mat <- data.matrix(mat)
 #Performs the GENIE3 algorithm
 weightMat <- GENIE3(mat)
 linklist <- getLinkList(weightMat)
-linkList_threshold <- getLinkList(weightMat, threshold=args[2])
+linkList_threshold <- getLinkList(weightMat, threshold=threshold)
 
-print(linklist_threshold)
+print(linkList_threshold)
