@@ -310,7 +310,7 @@ process GENIE_CONVERSION {
 process SLINGSHOT {
 
     container 'slingshot:latest'
-    publishDir "${params.outdir}/SCODE"
+    publishDir "${params.outdir}/SLINGSHOT"
 
     input:
     path slingshot_script
