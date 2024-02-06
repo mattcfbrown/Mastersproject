@@ -19,6 +19,8 @@ NI_con_scr     = file( params.NI_convert)
 file_correct   = file( params.input_fix)
 genie_script   = file( params.genie3_rscript)
 genie_con      = file( params.genie_convert)
+slingshot_scr  = file( params.slingshot)
+toy_counts     = file( params.toy_count)
 
 
 //Data we are currently using
@@ -123,30 +125,35 @@ workflow GENIE3 {
 
 workflow {
     //NLNET workflow
-    NLNET(
-        current,
-        nlnet_rscript,
-    )
+    //NLNET(
+    //    current,
+    //    nlnet_rscript,
+    //)
     //Information measures workflow
-    INFORMATION_MEASURES(
-        current,
-        file_correct
-    )
+    //INFORMATION_MEASURES(
+    //    current,
+    //    file_correct
+    //)
 
     //GENIE3 Method
-    GENIE3(
-        current,
-        genie_script
-    )
+    //GENIE3(
+    //    current,
+    //    genie_script
+    //)
 
     //Metrics workflow
-    METRICS(
-        NLNET.out.nlnet_output,
-        INFORMATION_MEASURES.out.im_output,
-        GENIE3.out.genie_output,
-        original,
-        metric_program
-    )
+    //METRICS(
+    //    NLNET.out.nlnet_output,
+    //    INFORMATION_MEASURES.out.im_output,
+    //    GENIE3.out.genie_output,
+    //    original,
+    //    metric_program
+    //)
+
+    SLINGSHOT(
+        slingshot_scr,
+        toy_counts
+    ).view()
 
     //Empirical Bayes method for network inference
     //EMPIRICAL_BAYES(
@@ -297,6 +304,24 @@ process GENIE_CONVERSION {
     script:
     """
     python3 ${genie_converter} ${output_genie} ${num_genes} > matrix_genie.csv
+    """
+}
+
+process SLINGSHOT {
+
+    container 'slingshot:latest'
+    publishDir "${params.outdir}/SCODE"
+
+    input:
+    path slingshot_script
+    path toy_counts
+
+    output:
+    path 'pseudotime.csv'
+
+    script:
+    """
+    Rscript ${slingshot_script} ${toy_counts} > pseudotime.csv
     """
 }
 
