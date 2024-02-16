@@ -4,26 +4,28 @@ import numpy as np
 import sys
 import re
 
-file = open('/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/troubleshooting/results/genie3/genie.txt','r')
-num_genes = 9
+infile = sys.argv[1]
+num_genes = int(sys.argv[2])
 
 #This produces a list containing all the values
 data = []
-for Lines in file.readlines():
-    if 'Gene' in Lines and 'regulatoryGene' not in Lines:
-        #Gets the location of the genes
-        location =[loc.start() for loc in re.finditer('Gene', Lines)]
-        #This gives us the gene number
-        location = [x+4 for x in location]
-        vals = []
-        for loc in location:
-            current = loc
-            gene_ID = ''
-            while Lines[current] != ' ':
-                gene_ID = gene_ID + Lines[current]
-                current = current + 1
-            vals.append(gene_ID)
-        data.append(vals)
+with open(infile, 'r') as fp:
+    lines = fp.readlines()
+
+for line in lines[1:]:
+    #Gets the location of the genes
+    location =[loc.start() for loc in re.finditer('Gene', line)]
+    #This gives us the gene number
+    location = [x+4 for x in location]
+    vals = []
+    for loc in location:
+        current = loc
+        gene_ID = ''
+        while line[current] != ' ':
+            gene_ID = gene_ID + line[current]
+            current = current + 1
+        vals.append(gene_ID)
+    data.append(vals)
 
 matrix = np.zeros((num_genes,num_genes))
 
