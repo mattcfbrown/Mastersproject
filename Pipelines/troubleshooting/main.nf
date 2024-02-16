@@ -21,6 +21,8 @@ genie_script   = file( params.genie3_rscript)
 genie_con      = file( params.genie_convert)
 slingshot_scr  = file( params.slingshot)
 toy_counts     = file( params.toy_count)
+SCODE_scr      = file( params.SCODE)
+scode_con_scr  = file( params.SCODE_convert)
 
 
 //Data we are currently using
@@ -28,6 +30,7 @@ current   = toy
 original  = toy_original
 threshold = 0.1
 num_genes = 9
+num_cells = 300
 
 //LNET workflow
 workflow NLNET {
@@ -93,6 +96,7 @@ workflow INFORMATION_MEASURES {
     im_output = NI_CONVERSION.out
 }
 
+//GENIE3 Workflow
 workflow GENIE3 {
     //Inputs
     take:
@@ -123,37 +127,77 @@ workflow GENIE3 {
     genie_output = GENIE_CONVERSION.out
 }
 
-workflow {
-    //NLNET workflow
-    //NLNET(
-    //    current,
-    //    nlnet_rscript,
-    //)
-    //Information measures workflow
-    //INFORMATION_MEASURES(
-    //    current,
-    //    file_correct
-    //)
+//SCODE Workflow
+workflow SCODE{
+    //Inputs
+    take:
+    path slingshot_scr                  //The script which runs the slingshot algorithm
+    path toy_counts                    //A matrix displaying the counts of each gene in the individual experiment
+    path current                      //Our original count matrix
+    path SCODE_scr                   //The script which runs SCODE
+    path scode_con_scr              //This script converts the SCODE output into something which can be measured
+    val num_cells                  //This is the number of cells in the data
+    val num_genes                 //This states the number of genes in the data    
 
-    //GENIE3 Method
-    //GENIE3(
-    //    current,
-    //    genie_script
-    //)
-
-    //Metrics workflow
-    //METRICS(
-    //    NLNET.out.nlnet_output,
-    //    INFORMATION_MEASURES.out.im_output,
-    //    GENIE3.out.genie_output,
-    //    original,
-    //    metric_program
-    //)
-
-    SLINGSHOT(
+    main:
+    //Step 1: Get pseudotime inputs using slingshot
+    time = SLINGSHOT(
         slingshot_scr,
         toy_counts
-    ).view()
+    )
+    //Step 2: Run the SCODE code
+    output_SCODE = SCODE_RUN(
+        SCODE_scr,
+        current,
+        time,
+        num_genes,
+        num_cells       
+    )
+    //Step 3: Convert the output into something workable
+    SCODE_CONVERT(
+        scode_con_scr,
+        output_SCODE
+    )   
+
+    //Output of the workflow
+    emit:
+    SCODE_output = SCODE_CONVERT.out
+}
+
+workflow {
+    //NLNET workflow
+    NLNET(
+        current,
+        nlnet_rscript,
+    )
+
+    //Information measures workflow
+    INFORMATION_MEASURES(
+        current,
+        file_correct
+    )
+
+    //GENIE3 Method
+    GENIE3(
+        current,
+        genie_script
+    )
+
+    //SCODE Method
+    SCODE(
+        slingshot_scr,
+        toy_counts        
+    )
+
+    //Metrics workflow
+    METRICS(
+        NLNET.out.nlnet_output,
+        INFORMATION_MEASURES.out.im_output,
+        GENIE3.out.genie_output,
+        SCODE.out.SCODE_output,
+        original,
+        metric_program
+    )
 
     //Empirical Bayes method for network inference
     //EMPIRICAL_BAYES(
@@ -310,18 +354,56 @@ process GENIE_CONVERSION {
 process SLINGSHOT {
 
     container 'slingshot:latest'
-    publishDir "${params.outdir}/SLINGSHOT"
+    publishDir "${params.outdir}/SCODE"
 
     input:
     path slingshot_script
     path toy_counts
 
     output:
-    path 'pseudotime.csv'
+    path 'mytable_R.txt'
 
     script:
     """
-    Rscript ${slingshot_script} ${toy_counts} > pseudotime.csv
+    Rscript ${slingshot_script} ${toy_counts} > mytable_R.txt
+    """
+}
+
+process SCODE_RUN {
+
+    publishDir "${params.outdir}/SCODE"
+
+    input:
+    path SCODE_script
+    path expression_data
+    path pseudotime
+    val num_genes
+    val num_cells
+
+    output:
+    path './out' 
+
+    script:
+    """
+    Rscript ${SCODE_script} ${expression_data} ${pseudotime} out ${num_genes} 4 ${num_cells} 100
+    """
+}
+
+process SCODE_CONVERT {
+
+    container 'nlnet_convert:latest'
+    publishDir "${params.outdir}/SCODE"
+
+    input:
+    path scode_con_scr
+    path input
+    
+    output:
+    path 'matrix_SCODE.csv'
+
+    script:
+    """
+    python3 ${scode_con_scr} ${input}/A.txt > matrix_SCODE.csv
     """
 }
 
@@ -376,6 +458,7 @@ process METRICS {
     path nlnet_matrix
     path ni_matrix
     path genie_matrix
+    path scode_matrix
     path original_matrix
     path metric_script
 
@@ -386,7 +469,7 @@ process METRICS {
     script:
 
     """
-    python3 ${metric_script} ${nlnet_matrix} ${ni_matrix} ${genie_matrix} ${original_matrix}
+    python3 ${metric_script} ${nlnet_matrix} ${ni_matrix} ${genie_matrix} ${scode_matrix} ${original_matrix}
     """    
 
 }

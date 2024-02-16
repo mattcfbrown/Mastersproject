@@ -1,8 +1,11 @@
 #This takes the output of SCODE inference and works out the network connections:
 
+from math import floor
 import numpy as np
+import sys
 
-file = np.loadtxt('/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/Data/TestSCODE.txt', delimiter='\t')
+input = sys.argv[1]
+file = np.loadtxt(input, delimiter='\t')
 
 #What we are going to do here is rank the absolute values produced.
 #2D ARRAY:
@@ -24,4 +27,19 @@ for i in range(num_genes):
 
 #We now sort the scores array to find the highest absolute values
 scores = scores[scores[:, 2].argsort()[::-1]]
+
+#We create a matrix, to which we can store our predictions
+matrix = np.zeros(shape = (num_genes,num_genes))
+#The total number of possible gene to gene connections which can exist
+total_con = num_genes*num_genes
+i = 0
+
+while i <= int(floor(total_con/2)-1):
+    gene1 = int(scores[i][0])
+    gene2 = int(scores[i][1])
+    matrix[gene1][gene2] = 1
+    i = i + 1
+
+np.savetxt("matrix_SCODE.csv", matrix, delimiter=",")
+
         

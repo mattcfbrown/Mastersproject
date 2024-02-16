@@ -6,11 +6,14 @@ library(slingshot)
 library(mclust, quietly = TRUE)
 
 #Read in the count matrix
-counts <- read.csv("/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/Data/toy_matrix.csv", header=FALSE, sep= ',') 
-counts = as.matrix(counts) 
+args = commandArgs(trailingOnly = TRUE)
+
+counts <- read.csv(args[1], header=FALSE, sep= ',') 
+counts = as.matrix(counts)
+num_genes <- dim(counts)[1]
 
 #Converts it into a form we can use
-rownames(counts) <- paste0('Genes',1:9)
+rownames(counts) <- paste0('Genes',1:num_genes)
 colnames(counts) <- paste0('Cell',1:300)
 toy <- SingleCellExperiment(assays = List(counts = counts))
 

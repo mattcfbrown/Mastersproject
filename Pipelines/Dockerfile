@@ -1,4 +1,4 @@
-FROM "amd64/r-base"
+FROM "arm64v8/r-base"
 
 LABEL image.author.name "Matthew Brown"
 LABEL image.author.email "brownmc@student.unimelb.edu.au"
@@ -12,7 +12,8 @@ RUN Rscript -e 'install.packages("RCurl")'
 RUN Rscript -e 'install.packages("BiocManager")'
 RUN Rscript -e 'install.packages("mclust")'
 RUN Rscript -e 'install.packages("igraph")'
-RUN Rscript -e 'BiocManager::install("slingshot", lib="/usr/local/lib/R/site-library", INSTALL_opts = "--no-staged-install")'
+RUN Rscript -e 'BiocManager::install("slingshot", INSTALL_opts = "--no-staged-install")'
+RUN Rscript -e 'BiocManager::install("DelayedMatrixStats")'
 RUN Rscript -e 'library("RCurl")'
 RUN Rscript -e 'library("igraph")'
 RUN Rscript -e 'library("slingshot")'
