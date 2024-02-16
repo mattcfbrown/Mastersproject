@@ -26,10 +26,10 @@ scode_con_scr  = file( params.SCODE_convert)
 
 
 //Data we are currently using
-current   = toy
+current   = count_matrix
 original  = toy_original
 threshold = 0.1
-num_genes = 9
+num_genes = 25
 num_cells = 300
 
 //LNET workflow
@@ -165,17 +165,17 @@ workflow SCODE{
 }
 
 workflow {
-    //NLNET workflow
-    NLNET(
-        current,
-        nlnet_rscript,
-    )
+    // //NLNET workflow
+    // NLNET(
+    //     current,
+    //     nlnet_rscript,
+    // )
 
-    //Information measures workflow
-    INFORMATION_MEASURES(
-        current,
-        file_correct
-    )
+    // //Information measures workflow
+    // INFORMATION_MEASURES(
+    //     current,
+    //     file_correct
+    // )
 
     //GENIE3 Method
     GENIE3(
@@ -183,21 +183,21 @@ workflow {
         genie_script
     )
 
-    //SCODE Method
-    SCODE(
-        slingshot_scr,
-        toy_counts        
-    )
+    // //SCODE Method
+    // SCODE(
+    //     slingshot_scr,
+    //     toy_counts        
+    // )
 
-    //Metrics workflow
-    METRICS(
-        NLNET.out.nlnet_output,
-        INFORMATION_MEASURES.out.im_output,
-        GENIE3.out.genie_output,
-        SCODE.out.SCODE_output,
-        original,
-        metric_program
-    )
+    // //Metrics workflow
+    // METRICS(
+    //     NLNET.out.nlnet_output,
+    //     INFORMATION_MEASURES.out.im_output,
+    //     GENIE3.out.genie_output,
+    //     SCODE.out.SCODE_output,
+    //     original,
+    //     metric_program
+    // )
 
     //Empirical Bayes method for network inference
     //EMPIRICAL_BAYES(
@@ -313,6 +313,8 @@ process NI_CONVERSION {
 
 process GENIE3_RUN {
 
+    cpus 4
+    memory '4 GB'
     container 'genie3:latest'
     publishDir "${params.outdir}/genie3"
 
@@ -335,7 +337,7 @@ process GENIE3_RUN {
 process GENIE_CONVERSION {
 
     container 'nlnet_convert:latest'
-    publishDir "${params.outdir}/genie3"
+    publishDir "${params.outdir}/genie3", mode: 'copy'
 
     input:
     path output_genie
