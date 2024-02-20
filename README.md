@@ -8,4 +8,4 @@ The first is the main pipeline, this is able to take sequencing data and produce
 
 The second is a similar pipeline, expect it is able to run multiple functions at once. 
 
-A third pipeline testing out prior usage for EMpirical Bayes will be created soon
+A third pipeline testing out prior usage for Empirical Bayes will be created soon
