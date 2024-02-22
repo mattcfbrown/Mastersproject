@@ -1,6 +1,7 @@
 using NetworkInference
 using EmpiricalBayes
 using DelimitedFiles
+using DataFrames, CSV
 
 #This function is used in the Empirical Bayes framework
 function to_index(label1::AbstractString, label2::AbstractString)
@@ -21,11 +22,21 @@ function to_index(nodes::Array{Node, 1})
 end
 
 
-#Values = ARGS
+Values = ARGS
+
+data = Values[1]
+p_val = parse(Float64, Values[2])
+prior_data = Values[3]
+type = Values[4]
 
 #Gets the network
-genes = get_nodes("/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/Empirical_Bayes_testing/results/Empirical_Bayes/formatted_data.txt");
+genes = get_nodes(data);
 network_EB = InferredNetwork(MINetworkInference(), genes);
+
+#Gets the prior information
+prior_file = DataFrame(CSV.File(Values[3], header= false))
+prior_file = Matrix(prior_file)
+
 
 #Now generates a dictionary of the prior information
 num_genes = length(genes)
@@ -39,7 +50,9 @@ end
 priors = Dict()
 for i in gene_names
     for j in gene_names
-        priors[(i,j)] = 0
+        edge1 = parse(Int,i[2:end]) + 1
+        edge2 = parse(Int,j[2:end]) + 1
+        priors[(i,j)] = prior_file[edge1,edge2]
     end
 end
 
@@ -72,12 +85,11 @@ sort!(eb_edges, rev = true, by = x->x.weight)
 
 #We now want to create a matrix which holds all the values
 matrix = zeros(Int,num_genes,num_genes)
-p_value = 0.9
 for i = 1:length(eb_edges)
     edge1 = eb_edges[i].nodes[1].label
     edge2 = eb_edges[i].nodes[2].label
     weight = eb_edges[i].weight
-    if weight < p_value
+    if weight < p_val
         break
     end
     edge1 = parse(Int,edge1[2:end]) + 1
@@ -87,4 +99,5 @@ for i = 1:length(eb_edges)
 end
 
 #writes the file to a matrix
-writedlm( "Eb_test.csv",  matrix, ',')
+name = join(["Eb_matrix_", type, ".csv"])
+writedlm( name,  matrix, ',')

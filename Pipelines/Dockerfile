@@ -9,6 +9,12 @@ RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/
     julia -e 'using Pkg; Pkg.update(); Pkg.add("Adapt"); Pkg.precompile();'
 
 RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
+    julia -e 'using Pkg; Pkg.update(); Pkg.add("CSV"); Pkg.precompile();'
+
+RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
+    julia -e 'using Pkg; Pkg.update(); Pkg.add("DataFrames"); Pkg.precompile();'
+
+RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
     julia -e 'using Pkg; Pkg.update(); Pkg.add("DelimitedFiles"); Pkg.precompile();'
 
 RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
