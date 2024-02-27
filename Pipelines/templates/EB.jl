@@ -29,12 +29,13 @@ p_val = parse(Float64, Values[2])
 prior_data = Values[3]
 type = Values[4]
 
+
 #Gets the network
 genes = get_nodes(data);
 network_EB = InferredNetwork(MINetworkInference(), genes);
 
 #Gets the prior information
-prior_file = DataFrame(CSV.File(Values[3], header= false))
+prior_file = DataFrame(CSV.File(prior_data, header= false))
 prior_file = Matrix(prior_file)
 
 
@@ -43,8 +44,8 @@ num_genes = length(genes)
 #Generate the names of the gene
 gene_names = []
 for i in 0:(num_genes-1)
-    name = string("T", i)
-    push!(gene_names,name)
+    cur_gene = string("T", i)
+    push!(gene_names,cur_gene)
 end
 #Builds the dictionary
 priors = Dict()
@@ -65,7 +66,7 @@ prior_list = [ get(priors, to_index(e.nodes), 0) for e in edge_list ]
 eb_edges = Array{Edge}(undef, length(edge_list))
 
 #Now run Empirical Bayes
-num_bins = 5
+num_bins = 8
 distr = :Gamma
 proportion_to_keep = 1.0
 tail = :two

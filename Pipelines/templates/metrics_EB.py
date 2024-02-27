@@ -17,6 +17,8 @@ original = np.genfromtxt(sys.argv[4], delimiter=",")
 original[0][0] = 0
 num_genes = int(np.size(original, 1))
 
+num_genes = sys.argv[5]
+
 #Now converying the matricies into a long list where AUROC comparisons can be made
 original = [x for row in original for x in row]
 no_prior = [x for row in no_prior for x in row]
@@ -33,7 +35,7 @@ no_prior_f1 = metrics.f1_score(original,no_prior)
 full_prior_f1 = metrics.f1_score(original,full_prior)
 genie_prior_f1 = metrics.f1_score(original,genie_prior)
 
-matthew_name = 'matthew.txt'
+matthew_name = 'matthew_' + str(num_genes) + '.txt'
 
 with open(matthew_name, 'w') as f:
     f.write('Matthew\'\ correlation:\n')
@@ -59,7 +61,7 @@ genie_prior_score = metrics.auc(fpr_genie_prior,tpr_genie_prior)
 
 
 #Plotting the graph
-plot_name = 'ROCplot.pdf'
+plot_name = plot_name = 'ROCplot_' + str(num_genes) + '.pdf'
 plt.plot(fpr_no_prior,tpr_no_prior, color ='r' ,label = 'No prior = %0.3f' %no_prior_score)                #No prior plot
 plt.plot(fpr_full_prior,tpr_full_prior, color ='g' ,label = 'Full prior = %0.3f' %full_prior_score)        #Full prior plot
 plt.plot(fpr_genie_prior,tpr_genie_prior, color ='b' ,label = 'genie3 prior = %0.3f' %genie_prior_score)   #Genie prior plot

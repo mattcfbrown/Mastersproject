@@ -11,89 +11,30 @@ genie3_con   = file( params.genie3_con )
 test_data    = file( params.test_data )
 gene_read25  = file( params.gene_read25 )
 gene_orig25  = file( params.gene_orig25 )
-zero_info    = file( params.no_prior )
+zero_info25  = file( params.no_prior )
+zero_info50  = file( params.zero_file50 )
+gene_read50  = file( params.gene_read50 )
+gene_orig50  = file( params.gene_orig50 )
 
 //All floating variables
 p_value   = 0.9
 num_genes = 25
+type = ["no_priors", "full_priors", "genie3_priors"]
 
-//Now get the packages we wish to work with
-include { EMPIRICAL_BAYES as NO_PRIORS } from './modules'
-include { EMPIRICAL_BAYES as FULL_PRIORS } from './modules'
-include { EMPIRICAL_BAYES as GENIE3_PRIORS } from './modules'
-include { GENIE3 as GENIE3 } from './modules'
+include { GENE25 as PRIOR_WORKFLOW } from './workflow'
 
 workflow {
-
-    //Run with no prior information
-    no_prior = NO_PRIORS(
+    GENE25(
         gene_read25,
-        zero_info,
-        p_value,
-        file_correct,
-        bayes_script,
-        'no_priors'
-    )
-
-    //Run with complete prior information
-    full_prior = FULL_PRIORS(
-        gene_read25,
+        zero_info25,
         gene_orig25,
         p_value,
         file_correct,
         bayes_script,
-        'full_priors'
-    )
-
-    //Gets genie3 prior information
-    genie3_info = GENIE3(
-        gene_read25,
         genie3_eb,
         genie3_con,
-        num_genes
-    )
-
-    //Now performs an empirical Bayes analysis
-    genie3_prior = GENIE3_PRIORS(
-        gene_read25,
-        genie3_info,
-        p_value,
-        file_correct,
-        bayes_script,
-        'genie3_priors'
-    )
-
-    //Performs a metric analysis
-    METRICS(
         metric_EB,
-        no_prior,
-        full_prior,
-        genie3_prior,
-        gene_orig25
+        num_genes,
+        type
     )
-}
-
-//Here I will perform some metrics on it, using a similar version of the script I developed for my original test
-process METRICS {
-
-    container 'metrics:latest'
-    publishDir "${params.outdir}/metrics"
-
-    input:
-    path script
-    path no_prior
-    path full_prior
-    path genie_prior
-    path original
-
-    output:
-    path 'ROCplot.pdf'
-    path 'matthew.txt'
-
-    script:
-
-    """
-    python3 ${script} ${no_prior} ${full_prior} ${genie_prior} ${original}
-    """    
-
 }
