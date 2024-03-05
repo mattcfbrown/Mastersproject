@@ -40,6 +40,10 @@ workflow PRIOR_WORKFLOW {
     metric_eb                          //Empirical Bayes metrics script
     num_genes                         //Number of genes in the RNA seq file
     type                             //A list which holds all the string data
+    keep                            //Tells us the proportion to keep
+    num_cells                      //The number of cells in the data
+    gam_or_norm                   //This states whether to use Gamma or Normal fitting    
+    inference                    //This says what type of inference technique to use
 
     main:
     //Run with no prior information
@@ -49,7 +53,10 @@ workflow PRIOR_WORKFLOW {
         p_value,
         eb_input_fix,
         bayes_script,
-        type[0]
+        type[0],
+        keep,
+        gam_or_norm,
+        inference
     )
     //Run with complete prior information
     full_prior = FULL_PRIORS(
@@ -58,7 +65,10 @@ workflow PRIOR_WORKFLOW {
         p_value,
         eb_input_fix,
         bayes_script,
-        type[1]
+        type[1],
+        keep,
+        gam_or_norm,
+        inference
     )
     //Gets genie3 prior information
     genie3_info = GENIE3(
@@ -74,7 +84,10 @@ workflow PRIOR_WORKFLOW {
         p_value,
         eb_input_fix,
         bayes_script,
-        type[2]
+        type[2],
+        keep,
+        gam_or_norm,
+        inference
     )
     //Performs a metric analysis
     METRICS(
@@ -83,7 +96,8 @@ workflow PRIOR_WORKFLOW {
         full_prior,
         genie3_prior,
         known_network,
-        num_genes
+        num_genes,
+        num_cells
     )
 }
 
@@ -164,16 +178,17 @@ process METRICS {
     path full_prior
     path genie_prior
     path original
-    val num_genes 
+    val num_genes
+    val num_cells
 
     output:
-    path "ROCplot_${num_genes}.pdf"
-    path "matthew_${num_genes}.txt"
+    path "ROCplot_${num_genes}_${num_cells}.pdf"
+    path "matthew_${num_genes}_${num_cells}.txt"
 
     script:
 
     """
-    python3 ${script} ${no_prior} ${full_prior} ${genie_prior} ${original} ${num_genes}
+    python3 ${script} ${no_prior} ${full_prior} ${genie_prior} ${original} ${num_genes} ${num_cells}
     """    
 
 }

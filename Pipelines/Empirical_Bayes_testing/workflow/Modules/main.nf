@@ -23,6 +23,9 @@ workflow EMPIRICAL_BAYES{
     conversion_script               //Script which converts the files into something workable
     eb_script                      //This script runs Empirical Bayes
     type                          //This is the type of prior we are giving it
+    keep                         //The proportion of values we are keeping when running EB
+    gam_or_norm                 //This states whether to use Gamma or Normal fitting
+    inference                  //What type of inference to use
 
     main:
     //Step 1: Makes it readable
@@ -37,7 +40,10 @@ workflow EMPIRICAL_BAYES{
         eb_script,
         priors,
         p_val,
-        type
+        type,
+        keep,
+        gam_or_norm,
+        inference
     )
 
     emit:
@@ -118,6 +124,9 @@ process EMPIRICAL_BAYES_RUN {
     path priors
     val p_val
     val type
+    val keep
+    val gam_or_norm
+    val inference
 
     output:
     path "Eb_matrix_${type}.csv"
@@ -125,7 +134,7 @@ process EMPIRICAL_BAYES_RUN {
     script:
 
     """
-    julia ${script} ${data} ${p_val} ${priors} ${type}
+    julia ${script} ${data} ${p_val} ${priors} ${type} ${keep} ${gam_or_norm} ${inference}
     """
    
 }

@@ -24,15 +24,34 @@ end
 
 Values = ARGS
 
+# data = "/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/Empirical_Bayes_testing/Data/25genes_2000cells.txt"
+# p_val = 0.9
+# prior_data = "/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/Empirical_Bayes_testing/Data/Original_test.csv"
+# type = "Test"
+# to_keep = 0.9
+# dist = :Normal
+
+
 data = Values[1]
 p_val = parse(Float64, Values[2])
 prior_data = Values[3]
 type = Values[4]
+to_keep = parse(Float64, Values[5])
+if Values[6] == "gam"
+    dist = :Gamma
+elseif Values[6] == "normal"
+    dist = :Normal
+end
+if Values[7] == "PUC"
+    inference = PUCNetworkInference()
+elseif Values[7] == "MI"
+    inference = MINetworkInference()
+end
 
 
 #Gets the network
 genes = get_nodes(data);
-network_EB = InferredNetwork(MINetworkInference(), genes);
+network_EB = InferredNetwork(inference, genes);
 
 #Gets the prior information
 prior_file = DataFrame(CSV.File(prior_data, header= false))
@@ -66,9 +85,9 @@ prior_list = [ get(priors, to_index(e.nodes), 0) for e in edge_list ]
 eb_edges = Array{Edge}(undef, length(edge_list))
 
 #Now run Empirical Bayes
-num_bins = 8
-distr = :Gamma
-proportion_to_keep = 1.0
+num_bins = 5
+distr = dist
+proportion_to_keep = to_keep
 tail = :two
 w0 = 2.2
 posteriors = empirical_bayes(test_statistics, prior_list, num_bins, distr, proportion_to_keep = proportion_to_keep, tail = tail, w0 = w0)
@@ -77,6 +96,16 @@ for i in 1:length(edge_list)
     nodes = edge_list[i].nodes
     eb_edges[i] = Edge(nodes, posteriors[i])
 end
+
+
+#Here I am going to print out the weights
+print(length(eb_edges))
+for i =1:length(eb_edges)
+    weight = eb_edges[i].weight
+    print(weight)
+    print("\n")
+end
+
 
 # Remove infinite values
 eb_edges = filter(x->isfinite(x.weight), eb_edges)
