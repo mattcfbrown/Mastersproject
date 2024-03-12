@@ -19,13 +19,18 @@ gene_orig50  = file( params.gene_orig50 )
 //All floating variables
 p_value   = 0.9
 num_genes = 50
-type = ["no_priors", "full_priors", "genie3_priors"]
+type = ["no_priors", "full_priors", "genie3_priors", "nlnet_priors"]
 
 //Now get the packages we wish to work with
 include { EMPIRICAL_BAYES as NO_PRIORS } from './modules'
 include { EMPIRICAL_BAYES as FULL_PRIORS } from './modules'
 include { EMPIRICAL_BAYES as GENIE3_PRIORS } from './modules'
+include { EMPIRICAL_BAYES as NLNET_PRIORS} from './modules'
+include { GENIE3_EB as GENIE3_EB } from './modules'
+include { NLNET as NLNET } from './modules'
+//These are the workflows for normal processes
 include { GENIE3 as GENIE3 } from './modules'
+include { INFORMATION_MEASURES as INFORMATION_MEASURES} from './modules'
 
 workflow PRIOR_WORKFLOW {
     take:
@@ -44,6 +49,13 @@ workflow PRIOR_WORKFLOW {
     num_cells                      //The number of cells in the data
     gam_or_norm                   //This states whether to use Gamma or Normal fitting    
     inference                    //This says what type of inference technique to use
+    nlnet_script                //This is the nlnet scores script
+    NI_script                  //The script which runs Information measures
+    NI_con_scr                //This script converts the Information measures output into something which can be measured
+    threshold                //This is the threshold used    
+    // genie_script               //The script which runs GENIE3
+    // genie_con_nor             //This script converts the GENIE3 output into something which can be measured
+    // threshold                //This is the threshold used
 
     main:
     //Run with no prior information
@@ -71,7 +83,7 @@ workflow PRIOR_WORKFLOW {
         inference
     )
     //Gets genie3 prior information
-    genie3_info = GENIE3(
+    genie3_info = GENIE3_EB(
         reads,
         eb_genie,
         genie3_con,
@@ -89,12 +101,49 @@ workflow PRIOR_WORKFLOW {
         gam_or_norm,
         inference
     )
+    //We now do the same thing for nlnet
+    nlnet_info = NLNET(
+        reads,
+        nlnet_script
+    )
+    //Now gets the NLNET prior
+    nlnet_prior = NLNET_PRIORS(
+        reads,
+        nlnet_info,
+        p_value,
+        eb_input_fix,
+        bayes_script,
+        type[3],
+        keep,
+        gam_or_norm,
+        inference
+    )
+
+    // genie3_normal = GENIE3(
+    //     reads,
+    //     genie_script,
+    //     genie_con_nor,
+    //     threshold,
+    //     num_genes
+    // )
+
+    ni_normal = INFORMATION_MEASURES(
+        reads,
+        eb_input_fix,
+        NI_script,
+        NI_con_scr,
+        threshold,
+        num_genes   
+    )
+
     //Performs a metric analysis
     METRICS(
         metric_eb,
         no_prior,
         full_prior,
         genie3_prior,
+        nlnet_prior,
+        ni_normal,
         known_network,
         num_genes,
         num_cells
@@ -177,6 +226,8 @@ process METRICS {
     path no_prior
     path full_prior
     path genie_prior
+    path nlnet_prior
+    path genie3_normal
     path original
     val num_genes
     val num_cells
@@ -188,7 +239,7 @@ process METRICS {
     script:
 
     """
-    python3 ${script} ${no_prior} ${full_prior} ${genie_prior} ${original} ${num_genes} ${num_cells}
+    python3 ${script} ${no_prior} ${full_prior} ${genie_prior} ${nlnet_prior} ${genie3_normal} ${original} ${num_genes} ${num_cells}
     """    
 
 }

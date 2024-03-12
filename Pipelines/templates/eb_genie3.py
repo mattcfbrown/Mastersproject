@@ -39,4 +39,4 @@ for x in data:
     val2 = int(x[1]) - 1
     matrix[val1][val2] = float(x[2])
 
-np.savetxt("matrix_genie.csv", matrix, delimiter=",")
+np.savetxt("matrix_genie_eb.csv", matrix, delimiter=",")
