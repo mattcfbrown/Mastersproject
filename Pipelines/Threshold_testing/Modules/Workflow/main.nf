@@ -73,6 +73,42 @@ workflow GENIE3 {
     genie_output = GENIE_CONVERSION_NOR.out
 }
 
+//Empirical Bayes workflow
+workflow EMPIRICAL_BAYES{
+    take:
+    reads                              //This is the gene sequencing reads
+    priors                            //This is the prior information 
+    p_val                            //This is the p value
+    conversion_script               //Script which converts the files into something workable
+    eb_script                      //This script runs Empirical Bayes
+    type                          //This is the type of prior we are giving it
+    keep                         //The proportion of values we are keeping when running EB
+    gam_or_norm                 //This states whether to use Gamma or Normal fitting
+    inference                  //What type of inference to use
+
+    main:
+    //Step 1: Makes it readable
+    data = EB_CONVERT(
+        reads,
+        conversion_script,
+        type
+    )
+    //Step 2: Run Empirical Bayes
+    EMPIRICAL_BAYES_RUN(
+        data,
+        eb_script,
+        priors,
+        p_val,
+        type,
+        keep,
+        gam_or_norm,
+        inference
+    )
+
+    emit:
+    output = EMPIRICAL_BAYES_RUN.out
+}
+
 //Processes
 //Mutual information process
 //Part 1, convert into a useable form
@@ -181,5 +217,53 @@ process GENIE_CONVERSION_NOR {
     script:
     """
     python3 ${genie_converter} ${output_genie} ${num_genes} ${threshold}
+    """
+}
+
+//Empirical Bayes process
+//Step 1: Convert it into a useable form
+process EB_CONVERT{
+
+    publishDir "${params.outdir}/${type}"
+
+    input:
+    path infile
+    path script
+    val type
+
+    output:
+    path 'formatted_data.txt'
+
+    script:
+
+    """
+    python3 ${script} ${infile} > formatted_data.txt
+    """    
+
+}
+
+//This gets the output of the Empirical bayes run
+process EMPIRICAL_BAYES_RUN {
+
+    container 'empiricalbayes:latest'
+    publishDir "${params.outdir}/${type}"
+
+    input:
+    path data
+    path script
+    path priors
+    val p_val
+    val type
+    val keep
+    val gam_or_norm
+    val inference
+
+    output:
+    path "Eb_matrix_${type}_${p_val}.csv"
+
+    script:
+
+    """
+    julia ${script} ${data} ${p_val} ${priors} ${type} ${keep} ${gam_or_norm} ${inference}
     """
 }

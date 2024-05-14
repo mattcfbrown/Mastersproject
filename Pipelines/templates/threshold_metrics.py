@@ -62,28 +62,28 @@ with open(matthew_name, 'w') as f:
 
 #Now calculate the Area under the curve
 #Note for now this only calculates the NLNET AUROC, but other metrics can be added once this has been completed. 
-fpr_first, tpr_first, thresholds_first = metrics.roc_curve(original,first_threshold)
-fpr_second, tpr_second, thresholds_second = metrics.roc_curve(original,second_threshold)
-fpr_third, tpr_third, thresholds_third = metrics.roc_curve(original,third_threshold)
-fpr_fourth, tpr_fourth, thresholds_fourth = metrics.roc_curve(original,fourth_threshold)
-fpr_fifth, tpr_fifth, thresholds_fifth = metrics.roc_curve(original,fifth_threshold)
+precision_first, recall_first, thresholds_first = metrics.precision_recall_curve(original,first_threshold)
+precision_second, recall_second, thresholds_second = metrics.precision_recall_curve(original,second_threshold)
+precision_third, recall_third, thresholds_third = metrics.precision_recall_curve(original,third_threshold)
+precision_fourth, recall_fourth, thresholds_fourth = metrics.precision_recall_curve(original,fourth_threshold)
+precision_fifth, recall_fifth, thresholds_fifth = metrics.precision_recall_curve(original,fifth_threshold)
 
-first_score = metrics.auc(fpr_first,tpr_first)
-second_score = metrics.auc(fpr_second,tpr_second)
-third_score = metrics.auc(fpr_third,tpr_third)
-fourth_score = metrics.auc(fpr_fourth,tpr_fourth)
-fifth_score = metrics.auc(fpr_fifth,tpr_fifth)
+first_score = metrics.auc(recall_first,precision_first)
+second_score = metrics.auc(recall_second,precision_second)
+third_score = metrics.auc(recall_third,precision_third)
+fourth_score = metrics.auc(recall_fourth,precision_fourth)
+fifth_score = metrics.auc(recall_fifth,precision_fifth)
 
 #Plotting the graph
 plot_name = plot_name = 'ROCplot_' + str(num_genes) + '_' + str(num_cells) + '_' + str(type) + '_'  + str(method) + '.pdf'
-plt.plot(fpr_first,tpr_first, color ='r' ,label = str(threshold[0]) + ' = %0.3f' %first_score)                
-plt.plot(fpr_second,tpr_second, color ='g' ,label = str(threshold[1]) + ' = %0.3f' %second_score)        
-plt.plot(fpr_third,tpr_third, color ='b' ,label = str(threshold[2]) + ' = %0.3f' %third_score)   
-plt.plot(fpr_fourth,tpr_fourth, color ='c' ,label = str(threshold[3]) + ' = %0.3f' %fourth_score)    
-plt.plot(fpr_fifth,tpr_fifth, color ='m' ,label = str(threshold[4]) + ' = %0.3f' %fifth_score)   
+plt.plot(precision_first,recall_first, color ='r' ,label = str(threshold[0]) + ' = %0.3f' %first_score)                
+plt.plot(precision_second,recall_second, color ='g' ,label = str(threshold[1]) + ' = %0.3f' %second_score)        
+plt.plot(precision_third,recall_third, color ='b' ,label = str(threshold[2]) + ' = %0.3f' %third_score)   
+plt.plot(precision_fourth,recall_fourth, color ='c' ,label = str(threshold[3]) + ' = %0.3f' %fourth_score)    
+plt.plot(precision_fifth,recall_fifth, color ='m' ,label = str(threshold[4]) + ' = %0.3f' %fifth_score)   
 plt.title('ROC curve')                                                                                     #Title
-plt.xlabel('FPR')                                                                                          #x label (false positive rate)
-plt.ylabel('TPR')                                                                                          #y label (true positive rate)
+plt.xlabel('precision')                                                                                    #x label (false positive rate)
+plt.ylabel('recall')                                                                                       #y label (true positive rate)
 plt.legend(loc = 'lower right')                                                                            #Legend
 plt.savefig(plot_name, format = "pdf")                                                                     #Saves the plot
 plt.show()             

@@ -53,9 +53,8 @@ workflow PRIOR_WORKFLOW {
     NI_script                  //The script which runs Information measures
     NI_con_scr                //This script converts the Information measures output into something which can be measured
     threshold                //This is the threshold used    
-    // genie_script               //The script which runs GENIE3
-    // genie_con_nor             //This script converts the GENIE3 output into something which can be measured
-    // threshold                //This is the threshold used
+    genie_script            //The script which runs GENIE3
+    genie_con_nor          //This script converts the GENIE3 output into something which can be measured
 
     main:
     //Run with no prior information
@@ -119,13 +118,13 @@ workflow PRIOR_WORKFLOW {
         inference
     )
 
-    // genie3_normal = GENIE3(
-    //     reads,
-    //     genie_script,
-    //     genie_con_nor,
-    //     threshold,
-    //     num_genes
-    // )
+    genie3_normal = GENIE3(
+        reads,
+        genie_script,
+        genie_con_nor,
+        threshold,
+        num_genes
+    )
 
     ni_normal = INFORMATION_MEASURES(
         reads,
@@ -144,6 +143,7 @@ workflow PRIOR_WORKFLOW {
         genie3_prior,
         nlnet_prior,
         ni_normal,
+        genie3_normal,
         known_network,
         num_genes,
         num_cells
@@ -227,6 +227,7 @@ process METRICS {
     path full_prior
     path genie_prior
     path nlnet_prior
+    path ni_normal
     path genie3_normal
     path original
     val num_genes
@@ -239,7 +240,32 @@ process METRICS {
     script:
 
     """
-    python3 ${script} ${no_prior} ${full_prior} ${genie_prior} ${nlnet_prior} ${genie3_normal} ${original} ${num_genes} ${num_cells}
+    python3 ${script} ${no_prior} ${full_prior} ${genie_prior} ${nlnet_prior} ${genie3_normal} ${ni_normal} ${original} ${num_genes} ${num_cells}
     """    
 
+}
+
+//This is where I get the graphical information pertaining to 
+process GRAPHS {
+
+    container 'metrics:latest'                  //I need a new container here
+    publishDir "${params.outdir}/metrics"
+
+    input:
+    path script
+    path data
+    val to_keep
+    val p_value
+    val data_type
+    val num_cells
+
+    output:
+    path "Null_Mix_${data_type}_${num_cells}.pdf"
+    path "Posterior_${data_type}_${num_cells}.pdf"
+
+    script:
+
+    """
+    julia ${script} ${data} ${to_keep} ${p_value} ${data_type} ${num_cells}
+    """
 }

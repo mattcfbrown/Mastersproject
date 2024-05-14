@@ -47,6 +47,8 @@ if Values[7] == "PUC"
 elseif Values[7] == "MI"
     inference = MINetworkInference()
 end
+# w0 = parse(Float64, Values[8])
+w0 = 2.2
 
 
 #Gets the network
@@ -72,7 +74,7 @@ for i in gene_names
     for j in gene_names
         edge1 = parse(Int,i[2:end]) + 1
         edge2 = parse(Int,j[2:end]) + 1
-        priors[(i,j)] = prior_file[edge1,edge2]
+        priors[(i,j)] = prior_file[edge1,edge2]*2.2
     end
 end
 
@@ -89,7 +91,6 @@ num_bins = 5
 distr = dist
 proportion_to_keep = to_keep
 tail = :two
-w0 = 2.2
 posteriors = empirical_bayes(test_statistics, prior_list, num_bins, distr, proportion_to_keep = proportion_to_keep, tail = tail, w0 = w0)
 
 for i in 1:length(edge_list)

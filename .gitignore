@@ -5,3 +5,6 @@ work/
 Data/expr_mat_small.loom
 Loom_practice/
 Julia_programs/
+/Pipelines/Extracting_Cells/Data/Research_data
+/Pipelines/Actual_data_tests
+results/

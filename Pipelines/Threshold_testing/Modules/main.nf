@@ -9,12 +9,18 @@ include { INFORMATION_MEASURES as MI_THRESHOLD2 } from './Workflow'
 include { INFORMATION_MEASURES as MI_THRESHOLD3 } from './Workflow'
 include { INFORMATION_MEASURES as MI_THRESHOLD4 } from './Workflow'
 include { INFORMATION_MEASURES as MI_THRESHOLD5 } from './Workflow'
-//This is the GENIE ones
+//This is the GENIE one
 include { GENIE3 as GENIE3_THRESHOLD1 } from './Workflow'
 include { GENIE3 as GENIE3_THRESHOLD2 } from './Workflow'
 include { GENIE3 as GENIE3_THRESHOLD3 } from './Workflow'
 include { GENIE3 as GENIE3_THRESHOLD4 } from './Workflow'
 include { GENIE3 as GENIE3_THRESHOLD5 } from './Workflow'
+//This is the Empirical Bayes one
+include { EMPIRICAL_BAYES as EMPIRICAL_BAYES_THRESHOLD1 } from './Workflow'
+include { EMPIRICAL_BAYES as EMPIRICAL_BAYES_THRESHOLD2 } from './Workflow'
+include { EMPIRICAL_BAYES as EMPIRICAL_BAYES_THRESHOLD3 } from './Workflow'
+include { EMPIRICAL_BAYES as EMPIRICAL_BAYES_THRESHOLD4 } from './Workflow'
+include { EMPIRICAL_BAYES as EMPIRICAL_BAYES_THRESHOLD5 } from './Workflow'
 
 
 //Workflows
@@ -150,6 +156,102 @@ workflow THRESH_GENIE3{
         genie_con,
         threshold[4],
         num_genes
+    )
+
+    METRIC_THRESHOLD(
+        metric,
+        output1,
+        output2,
+        output3,
+        output4,
+        output5,
+        original,
+        threshold_str,
+        type,
+        method,
+        num_cells,
+        num_genes
+    )
+}
+
+workflow THRESH_BAYES{
+    take:
+    reads                              //This is the gene sequencing reads
+    priors                            //This is the prior information 
+    p_val                            //This is the p value
+    conversion_script               //Script which converts the files into something workable
+    eb_script                      //This script runs Empirical Bayes
+    prior_type                    //This is the type of prior we are giving it
+    keep                         //The proportion of values we are keeping when running EB
+    gam_or_norm                 //This states whether to use Gamma or Normal fitting
+    inference                  //What type of inference to use
+    num_genes                 //The number of genes in the dataset
+    original                 //Original script
+    type                    //The type of data used
+    method                 //The method employed
+    num_cells             //Number of cells in the data
+    metric               //Metrics script needed
+    threshold_str       //A string with the threshold values
+
+    main:
+    output1 = EMPIRICAL_BAYES_THRESHOLD1(
+        reads,
+        priors,
+        p_val[0],
+        conversion_script,
+        eb_script,
+        prior_type,
+        keep,
+        gam_or_norm,
+        inference,
+    )
+
+    output2 = EMPIRICAL_BAYES_THRESHOLD2(
+        reads,
+        priors,
+        p_val[1],
+        conversion_script,
+        eb_script,
+        prior_type,
+        keep,
+        gam_or_norm,
+        inference,
+    )
+
+    output3 = EMPIRICAL_BAYES_THRESHOLD3(
+        reads,
+        priors,
+        p_val[2],
+        conversion_script,
+        eb_script,
+        prior_type,
+        keep,
+        gam_or_norm,
+        inference,
+    )
+
+    output4 = EMPIRICAL_BAYES_THRESHOLD4(
+        reads,
+        priors,
+        p_val[3],
+        conversion_script,
+        eb_script,
+        prior_type,
+        keep,
+        gam_or_norm,
+        inference,
+    )
+
+    output5 = EMPIRICAL_BAYES_THRESHOLD5(
+        reads,
+        priors,
+        p_val[4],
+        conversion_script,
+        eb_script,
+        prior_type,
+        keep,
+        gam_or_norm,
+        inference,
     )
 
     METRIC_THRESHOLD(

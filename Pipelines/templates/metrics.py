@@ -53,23 +53,23 @@ with open(matthew_name, 'w') as f:
 
 #Now calculate the Area under the curve
 #Note for now this only calculates the NLNET AUROC, but other metrics can be added once this has been completed. 
-fpr_nlnet, tpr_nlnet, thresholds_nlnet = metrics.roc_curve(original,nlnet_Data)
-fpr_ni, tpr_ni, thresholds_ni = metrics.roc_curve(original,ni_Data)
-fpr_genie, tpr_genie, thresholds_genie = metrics.roc_curve(original,genie_Data)
-fpr_scode, tpr_scode, thresholds_scode = metrics.roc_curve(original,SCODE_Data)
+precision_nlent, recall_nlnet, thresholds_nlnet = metrics.precision_recall_curve(original,nlnet_Data)
+precision_ni, recall_ni, thresholds_ni = metrics.precision_recall_curve(original,ni_Data)
+precision_genie, recall_genie, thresholds_genie = metrics.precision_recall_curve(original,genie_Data)
+precision_SCODE, recall_SCODE, thresholds_SCODE = metrics.precision_recall_curve(original,SCODE_Data)
 
-nlnet_score = metrics.auc(fpr_nlnet,tpr_nlnet)
-ni_score = metrics.auc(fpr_ni,tpr_ni)
-genie_score = metrics.auc(fpr_genie,tpr_genie)
-scode_score = metrics.auc(fpr_scode,tpr_scode)
+nlnet_score = metrics.auc(recall_nlnet,precision_nlent)
+ni_score = metrics.auc(recall_ni,precision_ni)
+genie_score = metrics.auc(recall_genie,precision_genie)
+scode_score = metrics.auc(recall_SCODE,precision_SCODE)
 
 
 #Plotting the graph
 plot_name = 'ROCplot_' + str(num_genes) + '.pdf'
-plt.plot(fpr_nlnet,tpr_nlnet, color ='r' ,label = 'nlnet = %0.3f' %nlnet_score)                #nlnet plot
-plt.plot(fpr_ni,tpr_ni, color ='g' ,label = 'Information_measures = %0.3f' %ni_score)          #ni plot
-plt.plot(fpr_genie,tpr_genie, color ='b' ,label = 'GENIE 3 = %0.3f' %genie_score)              #genie plot
-plt.plot(fpr_scode,tpr_scode, color ='k' ,label = 'SCODE = %0.3f' %scode_score)                #SCODE plot
+plt.plot(recall_nlnet,precision_nlent, color ='r' ,label = 'nlnet = %0.3f' %nlnet_score)                #nlnet plot
+plt.plot(recall_ni,precision_ni, color ='g' ,label = 'Information_measures = %0.3f' %ni_score)          #ni plot
+plt.plot(recall_genie,precision_genie, color ='b' ,label = 'GENIE 3 = %0.3f' %genie_score)              #genie plot
+plt.plot(recall_SCODE,precision_SCODE, color ='k' ,label = 'SCODE = %0.3f' %scode_score)                #SCODE plot
 plt.title('ROC curve')                                                                         #Title
 plt.xlabel('FPR')                                                                              #x label (false positive rate)
 plt.ylabel('TPR')                                                                              #y label (true positive rate)
