@@ -17,8 +17,11 @@ RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/
 RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
     julia -e 'using Pkg; Pkg.update(); Pkg.add("DelimitedFiles"); Pkg.precompile();'
 
-# RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
-#     julia -e 'using Pkg; Pkg.update(); Pkg.add("NetworkInference"); Pkg.precompile();'
+RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
+    julia -e 'using Pkg; Pkg.update(); Pkg.add("NetworkInference"); Pkg.precompile();'
+
+RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
+    julia -e 'using Pkg; Pkg.update(); Pkg.add(url="https://github.com/ananth-pallaseni/EmpiricalBayes.jl"); Pkg.precompile();'
 
 RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
     julia -e 'using Pkg; Pkg.update(); Pkg.add("Distributions"); Pkg.precompile();'
@@ -27,4 +30,4 @@ RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/
     julia -e 'using Pkg; Pkg.update(); Pkg.add("Plots"); Pkg.precompile();'
 
 RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
-    julia -e 'using Pkg; Pkg.update(); Pkg.add(url="https://github.com/ananth-pallaseni/EmpiricalBayes.jl"); Pkg.precompile();'
+    julia -e 'using Pkg; Pkg.update(); Pkg.add("Metrics"); Pkg.precompile();'

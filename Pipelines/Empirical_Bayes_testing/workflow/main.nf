@@ -248,8 +248,8 @@ process METRICS {
 //This is where I get the graphical information pertaining to 
 process GRAPHS {
 
-    container 'metrics:latest'                  //I need a new container here
-    publishDir "${params.outdir}/metrics"
+    container 'posterior:latest'                  //I need a new container here
+    publishDir "${params.outdir}/metrics/graphs"
 
     input:
     path script
