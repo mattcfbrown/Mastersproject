@@ -47,8 +47,8 @@ orig_found = [x for x in orig_found if x not in agreed]
 #Here are all the variables we will use for naming the file
 w0 = sys.argv[4]
 type = sys.argv[5]
-prior = sys.argv[6]
-file_name = 'metrics_' + str(type) + '_' + str(w0) + '_' + str(prior) + '.txt'
+# prior = sys.argv[6]
+file_name = 'metrics_' + str(type) + '_' + str(w0) + '.txt'
 with open(file_name, 'w') as f:
     f.write('AUPR score: ' + str(metrics.auc(recall,precision)) + '\n\n')
     f.write('Agreed upon gene connections (' + str(len(agreed)) + '):  \n')

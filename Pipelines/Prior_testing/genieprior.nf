@@ -20,11 +20,11 @@ workflow{
     //(ID, training dataset, testing dataset, ground truth network)
 
     //Ground truth networks
-    def groundtruth = Channel.fromPath( "../Actual_data_tests/Research_data/inputs/Curated/GSD/GSD-2000-?-50/refNetwork.csv" )
+    def groundtruth = Channel.fromPath( "../Actual_data_tests/Research_data/inputs/Curated/HSC/HSC-2000-?-50/refNetwork.csv" )
     //The training data
-    def training_expressions = Channel.fromPath( "../Actual_data_tests/Research_data/inputs/Curated/GSD/GSD-2000-?-50/ExpressionData.csv" )
+    def training_expressions = Channel.fromPath( "../Actual_data_tests/Research_data/inputs/Curated/HSC/HSC-2000-?-50/ExpressionData.csv" )
     //The testing data
-    def testing_expressions = Channel.fromPath( "../Actual_data_tests/Research_data/inputs/Curated/GSD/GSD-2000-?-70/ExpressionData.csv" )
+    def testing_expressions = Channel.fromPath( "../Actual_data_tests/Research_data/inputs/Curated/HSC/HSC-2000-?-70/ExpressionData.csv" )
     //The values of pi0 we will be testing for 2.2 = 0.9, 2.944 = 0.95
     def pi0 = Channel.of(2.2,2.944)    
     //Credit to this:

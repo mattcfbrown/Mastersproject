@@ -1,0 +1,13 @@
+name = "EB_Masters"
+uuid = "e057ac37-2565-4db8-8271-14aae810a8da"
+authors = ["mattcfbrown <brownmc@student.unimelb.edu.au>"]
+version = "0.1.0"
+
+[deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+EvalMetrics = "251d5f9e-10c1-4699-ba24-e0ad168fa3e4"
+NetworkInference = "6b44d3db-2bc5-5ac3-b70f-26aa69b1b11b"
+Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"

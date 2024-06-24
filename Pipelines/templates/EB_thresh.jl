@@ -38,7 +38,7 @@ prior_data = Values[3]
 type = Values[4]
 to_keep = parse(Float64, Values[5])
 w0 = parse(Float64, Values[6])
-prior_type = Values[7]
+# prior_type = Values[7]
 
 #Firstly tries the PUC network, and if this returns an error it will attempt to run the MI network
 try #PUC
@@ -123,7 +123,7 @@ try #PUC
     
     
     #writes the file to a matrix
-    name = join(["Eb_matrix_", type, "_", Values[6], "_", prior_type ,".csv"])
+    name = join(["Eb_matrix_", type, "_", Values[6],".csv"])
     writedlm( name,  matrix, ',')
 catch #MI
    #Gets the network
@@ -206,6 +206,6 @@ catch #MI
 
 
     #writes the file to a matrix
-    name = join(["Eb_matrix_", type, "_", Values[6], "_", prior_type ,".csv"])
+    name = join(["Eb_matrix_", type, "_", Values[6],".csv"])
     writedlm( name,  matrix, ',')
 end

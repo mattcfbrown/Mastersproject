@@ -27,8 +27,8 @@ workflow{
 
     //This is what I will use for all of the data if needed
     //This holds all the information:
-    def groundtruth = Channel.fromPath( "../Actual_data_tests/Research_data/inputs/Curated/HSC/HSC-2000-?-50/refNetwork.csv" )
-    def expressions = Channel.fromPath( "../Actual_data_tests/Research_data/inputs/Curated/HSC/HSC-2000-?-50/ExpressionData.csv" )
+    def groundtruth = Channel.fromPath( "../Actual_data_tests/Research_data/inputs/Curated/GSD/GSD-2000-?-50/refNetwork.csv" )
+    def expressions = Channel.fromPath( "../Actual_data_tests/Research_data/inputs/Curated/GSD/GSD-2000-?-50/ExpressionData.csv" )
     def pi0 = Channel.of(2.2,2.944)
     //Credit to this:
     //https://nextflow-io.github.io/patterns/create-key-to-combine-channels/

@@ -264,6 +264,14 @@ with open(matthew_name, 'w') as f:
     f.write('Missed gene connections = ' + str(len(orig_found_ni)) + '\n')
     f.write('\n')
     f.write('Incorrect gene connections = ' + str(len(sim_found_ni)) + '\n')
-    f.write('\n')    
+    f.write('\n')
+    f.write(str(agreed_no))
+    f.write('\n')
+    f.write(str(len(set(agreed_no))))
+    f.write('\n')
+    f.write(str(agreed_full))
+    f.write('\n')
+    f.write(str(len(agreed_full)))
+    f.write('\n')
 
 

@@ -56,7 +56,7 @@ incorrect_prior = []        #Incorrectly found prior
 for i in range(genie.shape[0]):
     for j in range(i,genie.shape[1]):
         #Agreement between both
-        if genie[i][j] == genie_prior[i][j] and original[i][j] == 1:
+        if genie[i][j] ==1 and genie_prior[i][j] == 1 and original[i][j] == 1:
             agreed.append('T' + str(i) + '----' + 'T' + str(j))
         #GENIE3 only
         elif genie[i][j] == 1 and genie_prior[i][j] == 0 and original[i][j] == 1:

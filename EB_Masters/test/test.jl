@@ -1,13 +1,4 @@
-#This file will contain the following:
-#1 A calculation of Empirical Bayes with the updated prior formula
-#2 Convert it into a matrix
-#3 Get a list of the genes (very basic T1 to T(num_genes))
-#4 Get the metric scores
-#5 Get a table with the data
-#6 Plot the data
-
-#The AUPR and the gene table will be added with a python file 
-
+#This is where I will test the EB_genie stuff, and work out what is going wrong
 #Load in all the functions
 using NetworkInference
 using Distributions
@@ -33,16 +24,15 @@ function to_index(nodes::Array{Node, 1})
     return to_index(n1.label, n2.label)
 end
 
-Values = ARGS
-
+#-----------------------READ IN THE DATA-----------------------
 #All the values needed to perform the calculations
 #This here gets the test statistics
-data = Values[1]
-prior_data = Values[2]
-p_val = parse(Float64, Values[3])
+data = "/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/Prior_testing/results/geniemetrics/EB_formatted/formatted_data.txt"
+prior_data = "/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/Prior_testing/results/geniemetrics/EB_formatted/matrix_genie_eb_2000.csv"
+p_val = 0.75
 
 genes = get_nodes(data);
-num_cells = Int(parse(Float64, Values[4]))
+num_cells = 2000
 if num_cells < 100
     inference = MINetworkInference()
     distr = :Gamma
@@ -66,7 +56,9 @@ for i in 0:(num_genes-1)
     cur_gene = string("T", i)
     push!(gene_names,cur_gene)
 end
-#Builds the dictionary
+
+#-----------------------------DATA FINISHES BEING READ IN----------------------
+#-----------------------------GET SOME OF THE PRIOR STUFF----------------------
 priors = Dict()
 for i in gene_names
     for j in gene_names
@@ -77,7 +69,7 @@ for i in gene_names
 end
 priors = [ get(priors, to_index(e.nodes), 0) for e in edge_list ]
 
-
+#------------------------RUN THE FIRST THREE FUNCTIONS OF EB--------------------
 num_bins = 5
 tail = :two
 w0=2.2
@@ -92,11 +84,11 @@ function get_distr(d::Symbol)
     return distrs[d]
 end
 
-#------------------------------Part 1------------------------------
 midpoints, counts, bin_width = discretize_test_statistics(test_statistics, num_bins)
 null_distr = fit_null_distribution(midpoints, counts, num_bins, bin_width, proportion_to_keep, get_distr(distr))
 mixture_pdf = fit_mixture_distribution(midpoints, counts, bin_width)
 
+#-------------------------------------Posterior calculation stuff---------------
 #From here we will be analysing the Posterior calculation
 null_pdf(x) = pdf(null_distr, x)
 
@@ -140,56 +132,20 @@ end
 #List where the edges will be stored
 eb_edges = Array{Edge}(undef, length(edge_list))
 for i in 1:length(edge_list)
-nodes = edge_list[i].nodes
-eb_edges[i] = Edge(nodes, posterior[i])
+    nodes = edge_list[i].nodes
+    eb_edges[i] = Edge(nodes, posterior[i])
 end
 
-#------------------------------Part 2------------------------------
-#Here is the final touch
 matrix = zeros(Int,num_genes,num_genes)
-for i = 1:length(eb_edges)
-edge1 = eb_edges[i].nodes[1].label
-edge2 = eb_edges[i].nodes[2].label
-weight = eb_edges[i].weight
-if weight < p_val
-    break
-end
-edge1 = parse(Int,edge1[2:end]) + 1
-edge2 = parse(Int,edge2[2:end]) + 1
-matrix[edge1,edge2] = 1
-matrix[edge2,edge1] = 1 
-end
-
-#writes the file to a matrix
-name = join(["EB_matrix_" ,Values[4], ".csv"])
-writedlm( name,  matrix, ',')
-
-#------------------------------Part 3------------------------------
-#The variable gene_names hold all the gene names (lol)
-
-#------------------------------Part 4------------------------------
-#Here we return the Null and mixture distribution values, along with the actual data
-final_data = Array{Float64}[]
-for i = [null_val,mix_val,test_statistics]
-    push!(final_data, i)
-end
-
-#Now put this data into a csv file with the following rows:
-#Row 1 = Null values
-#Row 2 = Mixture values
-#Row 3 = Actual data
-
-name_data = join(["data_" ,Values[4], ".csv"])
-writedlm( name_data,  final_data, ',')
-
-#We also wish to create a matrix where we have the data labelled, so we know where each datapoint came from 
-#This loops over all the edges, and we simply save the edges in an array
-gene_list = Array{String}[]
 for i = 1:length(eb_edges)
     edge1 = eb_edges[i].nodes[1].label
     edge2 = eb_edges[i].nodes[2].label
-    push!(gene_list, [edge1,edge2])
+    weight = eb_edges[i].weight
+    if weight < p_val
+        break
+    end
+    edge1 = parse(Int,edge1[2:end]) + 1
+    edge2 = parse(Int,edge2[2:end]) + 1
+    matrix[edge1,edge2] = 1
+    matrix[edge2,edge1] = 1 
 end
-
-gene_name = join(["gene_list_" ,Values[4], ".txt"])
-writedlm( gene_name,  gene_list, '\t')
