@@ -27,8 +27,19 @@ end
     @test get_priors(data,prior)[("T15", "T15")] == 2.2 #Diagonal
 end
 
-#I want to run the following tests:
+#Part 1: Perfect priors
+#1-A Perfect with clean data
+@testitem "Perfect prior with clean data" begin
+    data = "/Users/mbrown/Desktop/Research/Mastersproject/EB_Masters/test/Data/Read data/formatted_data_500.txt"
+    prior = "/Users/mbrown/Desktop/Research/Mastersproject/EB_Masters/test/Data/Perfect prior/Original_test.csv"
+    w0 = 2.2
+    to_keep = 0.8
+    multi = 10
+    truth = prior
+    @test metrics(data,prior,w0,to_keep,multi,truth) > 0.5 #Are we better than average
+end
 
+#Perfect prior
 #Good prior
 #Bad prior
 

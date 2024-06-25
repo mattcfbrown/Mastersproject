@@ -171,12 +171,15 @@ prior = "/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/Prior_testing/r
 w0 = 2.2
 to_keep = 0.8
 multi = 10
-matrix = run_EB(data,prior,w0,to_keep,multi)
+# matrix = run_EB(data,prior,w0,to_keep,multi)
 
+#Function to assess EvalMetrics
+function metrics(data,prior,w0,to_keep,multi,truth)
+    matrix = run_EB(data,prior,w0,to_keep,multi)
+    guess  = convert(Matrix{Float64},matrix)
+    actual = DataFrame(CSV.File(truth, header= false))
+    actual = Matrix(actual)
+    return au_prcurve(vec(actual),vec(guess))
+end
 
-#Let's get it working then I can put it into a function
-#Matrix in vector form
-guess = convert(Matrix{Float64},matrix)
-actual = DataFrame(CSV.File(prior, header= false))
-actual = Matrix(actual)
-au_prcurve(vec(actual),vec(guess))
+metrics(data,prior,w0,to_keep,multi,prior)

@@ -32,13 +32,15 @@ workflow EMPIRICAL_BAYES{
     keep                         //The proportion of values we are keeping when running EB
     gam_or_norm                 //This states whether to use Gamma or Normal fitting
     inference                  //What type of inference to use
+    num_cells                 //The number of cells used
 
     main:
     //Step 1: Makes it readable
     data = EB_CONVERT(
         reads,
         conversion_script,
-        type
+        type,
+        num_cells
     )
     //Step 2: Run Empirical Bayes
     EMPIRICAL_BAYES_RUN(
@@ -141,6 +143,7 @@ workflow INFORMATION_MEASURES {
     NI_con_scr               //This script converts the Information measures output into something which can be measured
     threshold               //This is the threshold used
     num_genes              //The number of genes in the dataset
+    num_cells             //The number of cells used
 
 
     //The nextflow process
@@ -148,7 +151,8 @@ workflow INFORMATION_MEASURES {
     //STEP 1: Put the data into a readable format
     corrected_matrix = INPUT_INFORMATION_MEASURES(
         current,
-        file_correct
+        file_correct,
+        num_cells
     )
     //STEP 2: Perform the algorithm
     output_NI = INFORMATION_MEASURES_RUN(
@@ -189,14 +193,15 @@ process EB_CONVERT{
     path infile
     path script
     val type
+    val num_cells
 
     output:
-    path 'formatted_data.txt'
+    path "formatted_data_${num_cells}.txt"
 
     script:
 
     """
-    python3 ${script} ${infile} > formatted_data.txt
+    python3 ${script} ${infile} ${num_cells}
     """    
 
 }
@@ -336,14 +341,15 @@ process INPUT_INFORMATION_MEASURES {
     input:
     path infile
     path script
+    val num_cells
 
     output:
-    path 'formatted_data.txt'
+    path "formatted_data_${num_cells}.txt"
 
     script:
 
     """
-    python3 ${script} ${infile} > formatted_data.txt
+    python3 ${script} ${infile} ${num_cells}
     """
 }
 

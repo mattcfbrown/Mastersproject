@@ -1,0 +1,9 @@
+name = "EB_Masters2"
+uuid = "855d3a53-6f6b-40f8-834b-91529bfdfe0f"
+authors = ["mattcfbrown <brownmc@student.unimelb.edu.au>"]
+version = "0.1.0"
+
+[deps]
+DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+EmpiricalBayes = "8e92ab38-2b57-47d5-bb6d-3ed32f7d75cb"
+NetworkInference = "6b44d3db-2bc5-5ac3-b70f-26aa69b1b11b"

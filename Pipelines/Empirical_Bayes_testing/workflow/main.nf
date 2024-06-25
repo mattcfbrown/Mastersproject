@@ -67,7 +67,8 @@ workflow PRIOR_WORKFLOW {
         type[0],
         keep,
         gam_or_norm,
-        inference
+        inference,
+        num_cells
     )
     //Run with complete prior information
     full_prior = FULL_PRIORS(
@@ -79,7 +80,8 @@ workflow PRIOR_WORKFLOW {
         type[1],
         keep,
         gam_or_norm,
-        inference
+        inference,
+        num_cells
     )
     //Gets genie3 prior information
     genie3_info = GENIE3_EB(
@@ -98,7 +100,8 @@ workflow PRIOR_WORKFLOW {
         type[2],
         keep,
         gam_or_norm,
-        inference
+        inference,
+        num_cells
     )
     //We now do the same thing for nlnet
     nlnet_info = NLNET(
@@ -115,7 +118,8 @@ workflow PRIOR_WORKFLOW {
         type[3],
         keep,
         gam_or_norm,
-        inference
+        inference,
+        num_cells
     )
 
     genie3_normal = GENIE3(
@@ -132,7 +136,8 @@ workflow PRIOR_WORKFLOW {
         NI_script,
         NI_con_scr,
         threshold,
-        num_genes   
+        num_genes,
+        num_cells   
     )
 
     //Performs a metric analysis

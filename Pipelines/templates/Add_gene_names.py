@@ -6,7 +6,9 @@ import sys
 input_file = open(sys.argv[1], 'r')
 
 #Create the file to which we want to output:
-output_file = open('formatted_data.txt', 'w+')
+num_genes = sys.argv[2]
+name = 'formatted_data_' + num_genes + '.txt'
+output_file = open(name, 'w+')
 
 
 #Put up the first two lines needed
