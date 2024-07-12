@@ -7,11 +7,11 @@ import re
 import math
 
 infile = sys.argv[1]
-gene_list = sys.argv[2]
-id = sys.argv[3]
-gene_list = open(gene_list,'r')
-gene_list = gene_list.readlines()
-num_genes = len(gene_list)
+# gene_list = sys.argv[2]
+id = sys.argv[2]
+# gene_list = open(gene_list,'r')
+# gene_list = gene_list.readlines()
+num_genes = 25
 
 #This produces a list containing all the values
 data = []

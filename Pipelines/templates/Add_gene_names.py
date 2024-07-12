@@ -2,7 +2,7 @@
 
 import sys
 
-#Read in the 
+#Read in the data
 input_file = open(sys.argv[1], 'r')
 
 #Create the file to which we want to output:

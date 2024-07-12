@@ -1,0 +1,5 @@
+[deps]
+DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+EmpiricalBayes = "8e92ab38-2b57-47d5-bb6d-3ed32f7d75cb"
+NetworkInference = "6b44d3db-2bc5-5ac3-b70f-26aa69b1b11b"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
