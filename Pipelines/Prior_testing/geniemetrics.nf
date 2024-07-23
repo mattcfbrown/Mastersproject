@@ -192,7 +192,12 @@ process METRICS {
     path("Null_Mixture_Genie_${id}.pdf") 
     path("Null_Mixture_Prior_${id}.pdf") 
     path("Null_Mixture_Incorrect_Genie_${id}.pdf") 
-    path("Null_Mixture_Incorrect_prior_${id}.pdf")        
+    path("Null_Mixture_Incorrect_prior_${id}.pdf")   
+    path("mixture_agree_${id}.pdf")   
+    path("mixture_genie_${id}.pdf")   
+    path("mixture_prior_${id}.pdf")   
+    path("mixture_incorrect_prior_${id}.pdf")   
+    path("mixture_incorrect_genie_${id}.pdf")     
     
     script:
 

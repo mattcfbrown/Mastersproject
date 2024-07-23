@@ -5,6 +5,7 @@ genie_script   = file( params.genie_script )
 genie_con_gene = file( params.genie_con_gene )
 input_fix      = file( params.input_fix )
 running_eb     = file( params.pidc_eb )
+metrics        = file( params.metrics )
 
 //P_value we will use
 p_val = 0.9
@@ -113,7 +114,10 @@ workflow{
     )
 
     //Step 6: We get some metrics about it's performance
-    
+    METRICS(
+        metrics,
+        eb_outputs
+    )
 
 }
 
@@ -200,3 +204,19 @@ process EB_RUN {
     """
 }
 
+process METRICS{
+
+    container 'metrics:latest'
+    publishDir "${params.outdir}/prior_genie/metrics"
+
+    input:
+    path script 
+    tuple val(id), path(truth), val(identifier), path(guess)
+
+    output:
+    path "metrics_${id}_${identifier}.txt"
+
+    """
+    python3 ${script} ${guess} ${truth} ${identifier} ${id}
+    """
+}

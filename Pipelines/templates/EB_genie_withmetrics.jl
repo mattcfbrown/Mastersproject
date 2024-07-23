@@ -44,11 +44,11 @@ p_val = parse(Float64, Values[3])
 genes = get_nodes(data);
 num_cells = Int(parse(Float64, Values[4]))
 if num_cells < 100
-    inference = MINetworkInference()
+    inference = PIDCNetworkInference() #Formally MI
     distr = :Gamma
     proportion_to_keep = 0.9
 else
-    inference = PUCNetworkInference()
+    inference = PIDCNetworkInference() #Formally PUC
     distr = :Normal
     proportion_to_keep = 0.9
 end
@@ -94,11 +94,12 @@ end
 
 #------------------------------Part 1------------------------------
 midpoints, counts, bin_width = discretize_test_statistics(test_statistics, num_bins)
-null_distr = fit_null_distribution(midpoints, counts, num_bins, bin_width, proportion_to_keep, get_distr(distr))
+null_distr = 0.5 #PIDC
+# null_distr = fit_null_distribution(midpoints, counts, num_bins, bin_width, proportion_to_keep, get_distr(distr))
 mixture_pdf = fit_mixture_distribution(midpoints, counts, bin_width)
 
 #From here we will be analysing the Posterior calculation
-null_pdf(x) = pdf(null_distr, x)
+# null_pdf(x) = pdf(null_distr, x)
 
 function prior_fn(x) 
 if x == 0*2.2
@@ -123,7 +124,8 @@ posterior = Array{Float64}(undef, num_test_statistics)
 for i in 1:num_test_statistics
     ts = test_statistics[i]
     prior_val = prior_fn(priors[i])
-    null_val[i] = null_pdf(ts)
+    # null_val[i] = null_pdf(ts)
+    null_val[i] = null_distr
     mix_val[i] = mixture_pdf(ts)
 
     # if mixture distr equals 0, then just return a 0 posterior
@@ -145,19 +147,29 @@ eb_edges[i] = Edge(nodes, posterior[i])
 end
 
 #------------------------------Part 2------------------------------
+eb_edges = Array{Edge}(undef, length(edge_list))
+unsorted_weight = zeros(length(edge_list))
+for i in 1:length(edge_list)
+    nodes = edge_list[i].nodes
+    eb_edges[i] = Edge(nodes, posterior[i])
+    unsorted_weight[i] = eb_edges[i].weight
+end
+
+permvec = sortperm(unsorted_weight)
+
 #Here is the final touch
 matrix = zeros(Int,num_genes,num_genes)
-for i = 1:length(eb_edges)
-edge1 = eb_edges[i].nodes[1].label
-edge2 = eb_edges[i].nodes[2].label
-weight = eb_edges[i].weight
-if weight < p_val
-    break
-end
-edge1 = parse(Int,edge1[2:end]) + 1
-edge2 = parse(Int,edge2[2:end]) + 1
-matrix[edge1,edge2] = 1
-matrix[edge2,edge1] = 1 
+for i in reverse(permvec)
+    edge1 = eb_edges[i].nodes[1].label
+    edge2 = eb_edges[i].nodes[2].label
+    weight = eb_edges[i].weight
+    if weight < p_val
+        break
+    end
+    edge1 = parse(Int,edge1[2:end]) + 1
+    edge2 = parse(Int,edge2[2:end]) + 1
+    matrix[edge1,edge2] = 1
+    matrix[edge2,edge1] = 1 
 end
 
 #writes the file to a matrix

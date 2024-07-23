@@ -13,6 +13,7 @@
 #--------------------Part 0-------------------------------------
 #We load in the libaries we will be using
 import sklearn.metrics as metrics
+import seaborn as sns
 import numpy as np
 import sys
 import matplotlib.pyplot as plt
@@ -118,8 +119,8 @@ i_g_priors = []
 i_p_priors = []
 connection_type = []
 for genes in gene_list:
-    gene1 = genes[0].decode('UTF-8')
-    gene2 = genes[1].decode('UTF-8')
+    gene1 = genes[0]
+    gene2 = genes[1]
     search = gene1 + '----' + gene2
     if search in agreed:
         connection_type.append(1)
@@ -133,13 +134,19 @@ for genes in gene_list:
         connection_type.append(3)
         p_priors.append(max(prior_info[int(gene1[1:]),int(gene2[1:])],
                             prior_info[int(gene2[1:]),int(gene1[1:])]) *2.2)
-    elif search in incorrect_genie:
+    elif search in incorrect_genie and search not in incorrect_prior:
         connection_type.append(4)
         i_g_priors.append(max(prior_info[int(gene1[1:]),int(gene2[1:])],
                             prior_info[int(gene2[1:]),int(gene1[1:])]) *2.2)
-    elif search in incorrect_prior:
+    elif search in incorrect_prior and search not in incorrect_genie:
         connection_type.append(5)
         i_p_priors.append(max(prior_info[int(gene1[1:]),int(gene2[1:])],
+                            prior_info[int(gene2[1:]),int(gene1[1:])]) *2.2)
+    elif search in incorrect_prior and search in incorrect_genie:
+        connection_type.append(6)
+        i_p_priors.append(max(prior_info[int(gene1[1:]),int(gene2[1:])],
+                            prior_info[int(gene2[1:]),int(gene1[1:])]) *2.2)
+        i_g_priors.append(max(prior_info[int(gene1[1:]),int(gene2[1:])],
                             prior_info[int(gene2[1:]),int(gene1[1:])]) *2.2)
     else:
         connection_type.append(0)
@@ -159,8 +166,8 @@ def prior_fn(x,w0,multi):
 agreed_index = [i for i, value in enumerate(connection_type) if value == 1]
 genie_index = [i for i, value in enumerate(connection_type) if value == 2]
 prior_index = [i for i, value in enumerate(connection_type) if value == 3]
-incorrect_genie_index = [i for i, value in enumerate(connection_type) if value == 4]
-incorrect_prior_index = [i for i, value in enumerate(connection_type) if value == 5]
+incorrect_genie_index = [i for i, value in enumerate(connection_type) if value == 4 or value == 6]
+incorrect_prior_index = [i for i, value in enumerate(connection_type) if value == 5 or value == 6]
 
 #We will firstly test it works for the agreed as a proof of concept, then expand for others
 #This gets the prior functions
@@ -173,8 +180,13 @@ for x_val in x:
 fig, ax = plt.subplots(2, 2)
 ax[0,0].plot(x,function_val)                                                  #Prior function
 ax[0,0].set_xlabel('x')
+ax[0,0].set_xlim([0, 2.2])
 ax[0,0].set_ylabel('Alpha value')
 ax[0,0].set_title('Prior function')
+
+a_prior_val = []
+for val in a_priors:
+    a_prior_val.append(prior_fn(val,2.2,10.0))
 
 colours_agreed = cm.rainbow(np.linspace(0, 1, len(agreed_index)))
 y_agreed = np.random.rand(len(agreed_index))/2
@@ -204,7 +216,7 @@ ax[1,0].set_ylim([0, 0.75])
 for i, txt in enumerate([value for value in range(1,len(agreed_index)+1,1)]):
     ax[1,0].annotate(txt, (a_priors[i], y_agreed[i]),fontsize=5)
 
-ax[1,1].scatter(1 - (a_priors)*data[0][agreed_index]/data[1][agreed_index], y_agreed,            #Posterior Linegraph
+ax[1,1].scatter(1 - a_prior_val*data[0][agreed_index]/data[1][agreed_index], y_agreed,            #Posterior Linegraph
                 c=colours_agreed,
                 s = 10)
 ax[1,1].set_xlabel('Posterior')
@@ -214,7 +226,7 @@ ax[1,1].set_title('Line graph of the Posterior')
 ax[1,1].set_ylim([0, 0.75])
 
 for i, txt in enumerate([value for value in range(1,len(agreed_index)+1,1)]):
-    ax[1,1].annotate(txt, ((1 - (a_priors)*data[0][agreed_index]/data[1][agreed_index])[i], y_agreed[i]),
+    ax[1,1].annotate(txt, ((1 - a_prior_val*data[0][agreed_index]/data[1][agreed_index])[i], y_agreed[i]),
                      fontsize=5)
 
 fig.suptitle('Plots for agreed upon connections for ' + str(id) + ' cells')
@@ -228,8 +240,13 @@ plt.savefig("Agreed_" + str(id) + ".pdf", format="pdf")
 fig, ax = plt.subplots(2, 2)
 ax[0,0].plot(x,function_val)                                                  #Prior function
 ax[0,0].set_xlabel('x')
+ax[0,0].set_xlim([0, 2.2])
 ax[0,0].set_ylabel('Alpha value')
 ax[0,0].set_title('Prior function')
+
+g_prior_val = []
+for val in g_priors:
+    g_prior_val.append(prior_fn(val,2.2,10.0))
 
 colours_genie = cm.rainbow(np.linspace(0, 1, len(genie_index)))
 y_genie = np.random.rand(len(genie_index))/2
@@ -259,7 +276,7 @@ ax[1,0].set_ylim([0, 0.75])
 for i, txt in enumerate([value for value in range(1,len(genie_index)+1,1)]):
     ax[1,0].annotate(txt, (g_priors[i], y_genie[i]),fontsize=5)
 
-ax[1,1].scatter(1 - (g_priors)*data[0][genie_index]/data[1][genie_index], y_genie,            #Posterior Linegraph
+ax[1,1].scatter(1 - g_priors*data[0][genie_index]/data[1][genie_index], y_genie,            #Posterior Linegraph
                 c=colours_genie,
                 s = 10)
 ax[1,1].set_xlabel('Posterior')
@@ -269,7 +286,7 @@ ax[1,1].set_title('Line graph of the Posterior')
 ax[1,1].set_ylim([0, 0.75])
 
 for i, txt in enumerate([value for value in range(1,len(genie_index)+1,1)]):
-    ax[1,1].annotate(txt, ((1 - (g_priors)*data[0][genie_index]/data[1][genie_index])[i], y_genie[i]),
+    ax[1,1].annotate(txt, ((1 - g_priors*data[0][genie_index]/data[1][genie_index])[i], y_genie[i]),
                      fontsize=5)
 
 fig.suptitle('Plots for Genie only connections for ' + str(id) + ' cells')
@@ -283,8 +300,13 @@ plt.savefig("Genie_" + str(id) + ".pdf", format="pdf")
 fig, ax = plt.subplots(2, 2)
 ax[0,0].plot(x,function_val)                                                  #Prior function
 ax[0,0].set_xlabel('x')
+ax[0,0].set_xlim([0, 2.2])
 ax[0,0].set_ylabel('Alpha value')
 ax[0,0].set_title('Prior function')
+
+p_prior_val = []
+for val in p_priors:
+    p_prior_val.append(prior_fn(val,2.2,10.0))
 
 colours_prior = cm.rainbow(np.linspace(0, 1, len(prior_index)))
 y_prior = np.random.rand(len(prior_index))/2
@@ -314,7 +336,7 @@ ax[1,0].set_ylim([0, 0.75])
 for i, txt in enumerate([value for value in range(1,len(prior_index)+1,1)]):
     ax[1,0].annotate(txt, (p_priors[i], y_prior[i]),fontsize=5)
 
-ax[1,1].scatter(1 - (p_priors)*data[0][prior_index]/data[1][prior_index], y_prior,            #Posterior Linegraph
+ax[1,1].scatter(1 - p_prior_val*data[0][prior_index]/data[1][prior_index], y_prior,            #Posterior Linegraph
                 c=colours_prior,
                 s = 10)
 ax[1,1].set_xlabel('Posterior')
@@ -324,7 +346,7 @@ ax[1,1].set_title('Line graph of the Posterior')
 ax[1,1].set_ylim([0, 0.75])
 
 for i, txt in enumerate([value for value in range(1,len(prior_index)+1,1)]):
-    ax[1,1].annotate(txt, ((1 - (p_priors)*data[0][prior_index]/data[1][prior_index])[i], y_prior[i]),
+    ax[1,1].annotate(txt, ((1 - p_prior_val*data[0][prior_index]/data[1][prior_index])[i], y_prior[i]),
                      fontsize=5)
 
 fig.suptitle('Plots for Prior only connections for ' + str(id) + ' cells')
@@ -338,8 +360,13 @@ plt.savefig("Prior_" + str(id) + ".pdf", format="pdf")
 fig, ax = plt.subplots(2, 2)
 ax[0,0].plot(x,function_val)                                                  #Prior function
 ax[0,0].set_xlabel('x')
+ax[0,0].set_xlim([0, 2.2])
 ax[0,0].set_ylabel('Alpha value')
 ax[0,0].set_title('Prior function')
+
+i_g_prior_val = []
+for val in i_g_priors:
+    i_g_prior_val.append(prior_fn(val,2.2,10.0))
 
 colours_incorrect_genie = cm.rainbow(np.linspace(0, 1, len(incorrect_genie_index)))
 y_incorrect_genie = np.random.rand(len(incorrect_genie_index))/2
@@ -369,7 +396,7 @@ ax[1,0].set_ylim([0, 0.75])
 for i, txt in enumerate([value for value in range(1,len(incorrect_genie_index)+1,1)]):
     ax[1,0].annotate(txt, (i_g_priors[i], y_incorrect_genie[i]),fontsize=5)
 
-ax[1,1].scatter(1 - (i_g_priors)*data[0][incorrect_genie_index]/data[1][incorrect_genie_index], y_incorrect_genie,            #Posterior Linegraph
+ax[1,1].scatter(1 - i_g_prior_val*data[0][incorrect_genie_index]/data[1][incorrect_genie_index], y_incorrect_genie,            #Posterior Linegraph
                 c=colours_incorrect_genie,
                 s = 10)
 ax[1,1].set_xlabel('Posterior')
@@ -379,7 +406,7 @@ ax[1,1].set_title('Line graph of the Posterior')
 ax[1,1].set_ylim([0, 0.75])
 
 for i, txt in enumerate([value for value in range(1,len(incorrect_genie_index)+1,1)]):
-    ax[1,1].annotate(txt, ((1 - (i_g_priors)*data[0][incorrect_genie_index]/data[1][incorrect_genie_index])[i], y_incorrect_genie[i]),
+    ax[1,1].annotate(txt, ((1 - i_g_prior_val*data[0][incorrect_genie_index]/data[1][incorrect_genie_index])[i], y_incorrect_genie[i]),
                      fontsize=5)
 
 fig.suptitle('Plots for Incorrect Genie connections for ' + str(id) + ' cells')
@@ -393,8 +420,13 @@ plt.savefig("Incorrect_Genie_" + str(id) + ".pdf", format="pdf")
 fig, ax = plt.subplots(2, 2)
 ax[0,0].plot(x,function_val)                                                            #Prior function
 ax[0,0].set_xlabel('x')
+ax[0,0].set_xlim([0, 2.2])
 ax[0,0].set_ylabel('Alpha value')
 ax[0,0].set_title('Prior function')
+
+i_p_prior_val = []
+for val in i_p_priors:
+    i_p_prior_val.append(prior_fn(val,2.2,10.0))
 
 colours_incorrect_prior = cm.rainbow(np.linspace(0, 1, len(incorrect_prior_index)))
 y_incorrect_prior = np.random.rand(len(incorrect_prior_index))/2
@@ -424,7 +456,7 @@ ax[1,0].set_ylim([0, 0.75])
 for i, txt in enumerate([value for value in range(1,len(incorrect_prior_index)+1,1)]):
     ax[1,0].annotate(txt, (i_p_priors[i], y_incorrect_prior[i]),fontsize=5)
 
-ax[1,1].scatter(1 - (i_p_priors)*data[0][incorrect_prior_index]/data[1][incorrect_prior_index], y_incorrect_prior,            #Posterior Linegraph
+ax[1,1].scatter(1 - i_p_prior_val*data[0][incorrect_prior_index]/data[1][incorrect_prior_index], y_incorrect_prior,            #Posterior Linegraph
                 c=colours_incorrect_prior,
                 s = 10)
 ax[1,1].set_xlabel('Posterior')
@@ -434,7 +466,7 @@ ax[1,1].set_title('Line graph of the Posterior')
 ax[1,1].set_ylim([0, 0.75])
 
 for i, txt in enumerate([value for value in range(1,len(incorrect_prior_index)+1,1)]):
-    ax[1,1].annotate(txt, ((1 - (i_p_priors)*data[0][incorrect_prior_index]/data[1][incorrect_prior_index])[i], y_incorrect_prior[i]),
+    ax[1,1].annotate(txt, ((1 - i_p_prior_val*data[0][incorrect_prior_index]/data[1][incorrect_prior_index])[i], y_incorrect_prior[i]),
                      fontsize=5)
 
 fig.suptitle('Plots for Incorrect Genie connections for ' + str(id) + ' cells')
@@ -671,3 +703,107 @@ plt.tight_layout()
 
 #We save the plot here
 plt.savefig("Null_Mixture_Incorrect_prior_" + str(id) + ".pdf", format="pdf")
+
+
+#---------------------------------------Part whatever, mixture dist--------------------------
+
+#Getting a histogram of mixture values
+
+fig, ax = plt.subplots()
+
+sns.histplot(data[2], bins = 20, stat = "density", kde=True, ax=ax)
+ax2 = ax.twinx()
+sns.scatterplot(x = data[2][agreed_index], y = y_agreed)
+plt.title('Mixture distribution for Agreed values')
+plt.xlabel('Test-statistic value')
+plt.ylabel('Density')
+
+
+
+for i, txt in enumerate([value for value in range(1,len(agreed_index)+1,1)]):
+    ax.annotate(txt, ((data[2][agreed_index])[i], 0),
+                     fontsize=5)
+
+
+plt.savefig("mixture_agree_" + str(id) + ".pdf", format = "pdf")
+
+
+
+#Genie
+fig, ax = plt.subplots()
+
+sns.histplot(data[2], bins = 20, stat = "density", kde=True, ax=ax)
+ax2 = ax.twinx()
+sns.scatterplot(x = data[2][genie_index], y = y_genie)
+plt.title('Mixture distribution for Genie only values')
+plt.xlabel('Test-statistic value')
+plt.ylabel('Density')
+
+
+
+for i, txt in enumerate([value for value in range(1,len(genie_index)+1,1)]):
+    ax.annotate(txt, ((data[2][genie_index])[i], 0),
+                     fontsize=5)
+
+
+plt.savefig("mixture_genie_" + str(id) + ".pdf", format = "pdf")
+
+#Prior only
+
+fig, ax = plt.subplots()
+
+sns.histplot(data[2], bins = 20, stat = "density", kde=True, ax=ax)
+ax2 = ax.twinx()
+sns.scatterplot(x = data[2][prior_index], y = y_prior)
+plt.title('Mixture distribution for prior only values')
+plt.xlabel('Test-statistic value')
+plt.ylabel('Density')
+
+
+
+for i, txt in enumerate([value for value in range(1,len(prior_index)+1,1)]):
+    ax.annotate(txt, ((data[2][prior_index])[i], 0),
+                     fontsize=5)
+
+
+plt.savefig("mixture_prior_" + str(id) + ".pdf", format = "pdf")
+
+
+#Incorrect prior
+fig, ax = plt.subplots()
+
+sns.histplot(data[2], bins = 20, stat = "density", kde=True, ax=ax)
+ax2 = ax.twinx()
+sns.scatterplot(x = data[2][incorrect_prior_index], y = y_incorrect_prior)
+plt.title('Mixture distribution for incorrect prior values')
+plt.xlabel('Test-statistic value')
+plt.ylabel('Density')
+
+
+
+for i, txt in enumerate([value for value in range(1,len(incorrect_prior_index)+1,1)]):
+    ax.annotate(txt, ((data[2][incorrect_prior_index])[i], 0),
+                     fontsize=5)
+
+
+plt.savefig("mixture_incorrect_prior_" + str(id) + ".pdf", format = "pdf")
+
+
+#Incorrect genie
+fig, ax = plt.subplots()
+
+sns.histplot(data[2], bins = 20, stat = "density", kde=True, ax=ax)
+ax2 = ax.twinx()
+sns.scatterplot(x = data[2][incorrect_genie_index], y = y_incorrect_genie)
+plt.title('Mixture distribution for incorrect Genie values')
+plt.xlabel('Test-statistic value')
+plt.ylabel('Density')
+
+
+
+for i, txt in enumerate([value for value in range(1,len(incorrect_genie_index)+1,1)]):
+    ax.annotate(txt, ((data[2][incorrect_genie_index])[i], 0),
+                     fontsize=5)
+
+
+plt.savefig("mixture_incorrect_genie_" + str(id) + ".pdf", format = "pdf")

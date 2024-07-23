@@ -5,7 +5,8 @@ using EmpiricalBayes
 using Distributions
 
 #Data used
-data = "/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/PIDC_testing/Data/100_ecoli1_large.txt"
+data = "/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/PIDC_testing/Data/shuffled.txt"
+# data = "/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/PIDC_testing/Data/indepenent.txt"
 inference = PIDCNetworkInference()
 
 # #This file will aim to do the following:
@@ -26,7 +27,7 @@ ten_removed = test_statistics[test_statistics .< threshold]
 #This method comes from EmpiricalBayes Package
 #I have already removed the top 10% of statistics, and as such, will not need to further improve on it 
 #Firstly some variables needed for below
-# num_bins = 10 #Number of bins, reflects the histogram above
+num_bins = 10 #Number of bins, reflects the histogram above
 # proportion_to_keep = 1.0 #We keep it all as we did it before
 
 #For the distributions
@@ -41,20 +42,31 @@ end
 #Do part 1
 midpoints, counts, bin_width = discretize_test_statistics(ten_removed, num_bins)
 #Now part 2
-null_distr_norm = fit_null_distribution(midpoints, counts, num_bins, bin_width, proportion_to_keep, Normal)
-null_distr_gamm = fit_null_distribution(midpoints, counts, num_bins, bin_width, proportion_to_keep, Gamma)
+# null_distr_norm = fit_null_distribution(midpoints, counts, num_bins, bin_width, proportion_to_keep, Normal)
+# null_distr_gamm = fit_null_distribution(midpoints, counts, num_bins, bin_width, proportion_to_keep, Gamma)
 
 #This ius a function we can use for plotting
-null_norm(x) = pdf(null_distr_norm, x)
-null_gamm(x) = pdf(null_distr_gamm, x)
+# null_norm(x) = pdf(null_distr_norm, x)
+# null_gamm(x) = pdf(null_distr_gamm, x)
 
 #Step 3: Get histogram of the values used, plot the normal over the top
-num_edges = length(ten_removed)
+num_edges = length(test_statistics)
 b_range = range(0,2, length = 10)
-plot(sort(ten_removed), (1:num_edges)./num_edges)
-plot!(range(0,threshold, length = 50),
-range(0,1, length = 50))
-# histogram(ten_removed, normalize=:pdf, label = "PIDC", color = :gray, bins=b_range)
+
+# plot(sort(test_statistics), (1:num_edges)./num_edges,
+# title = "PIDC", label = "PIDC CDF")
+# plot!(range(0,2, length = 50),
+# range(0,1, length = 50),
+# label = "Uniform CDF")
+# xlabel!("c")
+# ylabel!("F(c)")
+
+histogram(test_statistics, normalize=:pdf, label = "PIDC", color = :blue, bins=b_range, 
+title = "PIDC pdf")
+plot!([0,2],[0.5,0.5],
+label = "Uniform")
+xlabel!("c")
+ylabel!("f(c)")
 # plot!(null_norm, label = "Normal", color = :red)
 # plot!(null_gamm, label = "Gamma", color = :blue)
 
