@@ -137,6 +137,6 @@ end
 
 #writes the file to a matrix
 num_cells = Values[4]
-type = Values[5]
-name = join(["Eb_matrix_", num_cells, "_", type, ".csv"])
+# type = Values[5]
+name = join(["Eb_matrix_", num_cells, ".csv"])
 writedlm( name,  matrix, ',')

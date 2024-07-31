@@ -1,4 +1,8 @@
-FROM python:3.10
+FROM "arm64v8/r-base"
 
-RUN pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir numpy scipy scikit-learn matplotlib seaborn
+LABEL image.author.name "Matthew Brown"
+LABEL image.author.email "brownmc@student.unimelb.edu.au"
+
+RUN Rscript -e 'install.packages("Hmisc")'
+
+ENV PATH=$PATH:/usr/games/

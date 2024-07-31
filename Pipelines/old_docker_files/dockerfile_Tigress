@@ -1,0 +1,9 @@
+FROM "arm64v8/r-base"
+
+LABEL image.author.name "Matthew Brown"
+LABEL image.author.email "brownmc@student.unimelb.edu.au"
+
+RUN Rscript -e 'install.packages("remotes")'
+RUN Rscript -e 'remotes::install_github("jpvert/tigress")'
+
+ENV PATH=$PATH:/usr/games/
