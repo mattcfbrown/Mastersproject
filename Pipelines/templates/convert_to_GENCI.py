@@ -2,8 +2,10 @@
 
 import numpy as np
 import pandas as pd
+import sys
 
-input = "/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/Ensemble_testing/Data/25genes_250cells.txt"
+input = sys.argv[1]
+id = sys.argv[2]
 data = np.genfromtxt(input, delimiter="\t")
 
 gene_names = []
@@ -20,4 +22,5 @@ for j in range(data.shape[1]):
 
 df = pd.DataFrame(data, index=gene_names, columns=cell_names)
 print(df)
-df.to_csv('test.csv', index=True, header=True, sep=',')
+name = "genci_input_" + str(id) + ".csv"
+df.to_csv(name, index=True, header=True, sep=',')

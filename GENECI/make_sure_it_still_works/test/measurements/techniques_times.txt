@@ -1,0 +1,3 @@
+Infer gene regulatory network with available techniques: 
+	- PIDC:	0 days 00:00:52.325743844
+

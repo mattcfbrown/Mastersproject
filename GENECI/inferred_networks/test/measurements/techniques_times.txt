@@ -1,0 +1,5 @@
+Infer gene regulatory network with available techniques: 
+	- CLR:	0 days 00:00:05.178624961
+	- GENIE3_RF:	0 days 00:03:59.835298166
+	- PIDC:	0 days 00:01:11.865465964
+

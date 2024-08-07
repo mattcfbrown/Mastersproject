@@ -8,3 +8,5 @@ Julia_programs/
 /Pipelines/Extracting_Cells/Data/Research_data
 /Pipelines/Actual_data_tests
 results/
+.venv/
+geneci_python/env/
