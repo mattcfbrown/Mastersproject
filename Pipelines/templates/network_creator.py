@@ -4,9 +4,14 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 mydata = np.genfromtxt('/Users/mbrown/Desktop/Research/Mastersproject/GENECI/input_data/simulated_scratch/GS/sim_eipo-modular_size-20_mixed_gs.csv', 
                        delimiter=',', dtype=None, encoding=None, skip_header=True)
+
+file = '/Users/mbrown/Desktop/Research/Mastersproject/GENECI/input_data/simulated_scratch/GS/sim_eipo-modular_size-20_mixed_gs.csv'
+cols = list(pd.read_csv(file, nrows=1))
+mydatagain = pd.read_csv(file, index_col=0)
 
 list_of_lists = []
 for i in range(mydata.size):
@@ -22,6 +27,7 @@ matrix = np.array(list_of_lists)
 num_genes = matrix[0].size
 labels = list(range(num_genes))
 labels = {labels[i]: i for i in range(num_genes)}
+print(labels)
 
 def show_graph_with_labels(adjacency_matrix, mylabels):
     rows, cols = np.where(adjacency_matrix == 1)
@@ -38,4 +44,9 @@ gr.add_edges_from(edges)
 print(nx.find_cycle(gr))
 print(nx.simple_cycles(gr))
 
-show_graph_with_labels(matrix, labels)
+# show_graph_with_labels(matrix, labels)
+print(mydatagain)
+G = nx.DiGraph(mydatagain.values)
+nx.draw(G)
+plt.show()
+

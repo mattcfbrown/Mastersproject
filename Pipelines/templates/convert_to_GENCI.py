@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 import sys
 
-input = sys.argv[1]
-id = sys.argv[2]
+input = '/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/GENCI_nextflow_pipeline/Data/Files/data_FFL_clean.txt'
+id = 'FFL_clean'
 data = np.genfromtxt(input, delimiter="\t")
 
 gene_names = []
@@ -21,6 +21,5 @@ for j in range(data.shape[1]):
     cell_names.append(name)
 
 df = pd.DataFrame(data, index=gene_names, columns=cell_names)
-print(df)
 name = "genci_input_" + str(id) + ".csv"
 df.to_csv(name, index=True, header=True, sep=',')

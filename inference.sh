@@ -1,3 +1,12 @@
-geneci infer-network --expression-data ../GENECI/test.csv\
-    --technique PIDC \
-    --output-dir ../GENECI/make_sure_it_still_works
+geneci infer-network --expression-data /Users/mbrown/Desktop/Research/Mastersproject/GENECI/test.csv \
+                     --technique GENIE3_ET \
+                     --technique CMI2NI \
+                     --technique GENIE3_RF \
+                     --technique INFERELATOR \
+                     --technique RSNET \
+                     --technique LEAP \
+                     --technique PCACMI \
+                     --technique CLR \
+                     --technique LOCPCACMI \
+                     --technique GRNBOOST2 \
+                     --output-dir ../GENECI/lots_of_techniques
