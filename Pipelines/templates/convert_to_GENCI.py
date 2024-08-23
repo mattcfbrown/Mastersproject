@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 import sys
 
-input = '/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/GENCI_nextflow_pipeline/Data/Files/data_FFL_clean.txt'
-id = 'FFL_clean'
+input = '/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/GENCI_nextflow_pipeline/Data/BEELINE/Files/messy_1.txt'
+id = 'messy_1'
 data = np.genfromtxt(input, delimiter="\t")
 
 gene_names = []

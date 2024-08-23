@@ -12,13 +12,14 @@ id = sys.argv[4]
 #https://stackoverflow.com/questions/71758470/numpy-reading-a-csv-file-with-string-header-and-row-names
 Get_names = np.genfromtxt(train, delimiter= ',', skip_header=0,dtype=None)
 #Gets the gene names
-gene_names = [name.decode('UTF-8') for name in Get_names[:,0]][1:]
+gene_names = [name for name in Get_names[:,0]][1:]
+print(gene_names)
 
 
 #Puts the read data into a numpy array, which we can return as a .csv file
 train = np.genfromtxt(train, delimiter= ',', skip_header=1)
 test = np.genfromtxt(test, delimiter= ',', skip_header=1)
-train = test[:,1:]
+train = train[:,1:]
 test = test[:,1:]
 np.savetxt("training" + str(id) + ".txt", train.astype(float), delimiter="\t")
 np.savetxt("testing" + str(id) + ".txt", test.astype(float), delimiter="\t")

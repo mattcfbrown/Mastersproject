@@ -15,8 +15,10 @@ onlyfiles = [f for f in listdir(path) if isfile(join(path, f))]
 #We then read in both EB files
 eb_full = sys.argv[2]
 eb_ten = sys.argv[3]
+eb_boot = sys.argv[8]
 onlyfiles.append(eb_full)
 onlyfiles.append(eb_ten)
+onlyfiles.append(eb_boot)
 
 #We now read in the ground truth network
 original = sys.argv[4]
@@ -41,6 +43,7 @@ found = []     #Holds all found
 missed = []    #Holds the missed
 incorrect = [] #Holds the incorrect
 num_connections = num_genes*num_genes - num_genes
+threshold = 0.3
 
 #Making a quick gene_list
 gene_list = []
@@ -65,6 +68,9 @@ for method in onlyfiles:
     elif name == 'EB_ten':
         matrix = np.genfromtxt(eb_ten, delimiter=',',
                         dtype=None)
+    elif name == 'EB_bootstrapping':
+        matrix = np.genfromtxt(eb_boot, delimiter=',',
+                        dtype=None)
     else:
         if name == 'ensemble_all':
             file = np.genfromtxt(ensemble_full, delimiter=',',
@@ -78,6 +84,7 @@ for method in onlyfiles:
         #We only want the top 10% of connections
         matrix = np.zeros(shape=(num_genes,num_genes))
         hit = 0
+        num_rows = file.shape[0]
         for i in range(len(file)):
             gene1 = int(file[i][0][1:])
             gene2 = int(file[i][1][1:])
@@ -89,7 +96,7 @@ for method in onlyfiles:
                 matrix[gene1][gene2] = 1
                 matrix[gene2][gene1] = 1
                 hit = hit + 1
-            if hit == round(num_connections/20):
+            if hit == round(num_connections*threshold*0.5) or num_rows == i+1:
                 break
     
     #Now get the AUPR scores

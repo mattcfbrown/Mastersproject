@@ -71,7 +71,7 @@ ten_list = [ get(ten_matrix, to_index(e.nodes), 0) for e in edge_list ]
 #Some variables
 num_bins = 5
 distr = :Normal
-proportion_to_keep = 0.9
+proportion_to_keep = 0.8
 tail = :two
 w0 = 2.2
 

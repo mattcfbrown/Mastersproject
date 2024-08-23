@@ -1,0 +1,12 @@
+name = "julia_environment"
+uuid = "02bc5769-1dd6-4f35-a1a7-bae78c428df6"
+authors = ["mattcfbrown <brownmc@student.unimelb.edu.au>"]
+version = "0.1.0"
+
+[deps]
+Adapt = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+EmpiricalBayes = "8e92ab38-2b57-47d5-bb6d-3ed32f7d75cb"
+NetworkInference = "6b44d3db-2bc5-5ac3-b70f-26aa69b1b11b"

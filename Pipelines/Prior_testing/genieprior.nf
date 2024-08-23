@@ -20,27 +20,28 @@ workflow{
     //(ID, training dataset, testing dataset, ground truth network)
 
     //Ground truth networks
-    def groundtruth = Channel.fromPath( "../Actual_data_tests/Research_data/inputs/Curated/HSC/HSC-2000-?-50/refNetwork.csv" )
+    def groundtruth = Channel.fromPath( "../Actual_data_tests/Research_data/inputs/Curated/HSC/HSC-2000-*/refNetwork.csv" )
     //The training data
-    def training_expressions = Channel.fromPath( "../Actual_data_tests/Research_data/inputs/Curated/HSC/HSC-2000-?-50/ExpressionData.csv" )
+    def training_expressions = Channel.fromPath( "../Actual_data_tests/Research_data/inputs/Curated/HSC/HSC-2000-*/ExpressionData.csv" )
     //The testing data
-    def testing_expressions = Channel.fromPath( "../Actual_data_tests/Research_data/inputs/Curated/HSC/HSC-2000-?-70/ExpressionData.csv" )
+    def testing_expressions = Channel.fromPath( "../Actual_data_tests/Research_data/inputs/Curated/HSC/HSC-2000-*-50/ExpressionData.csv" )
     //The values of pi0 we will be testing for 2.2 = 0.9, 2.944 = 0.95
     def pi0 = Channel.of(2.2,2.944)    
     //Credit to this:
     //https://nextflow-io.github.io/patterns/create-key-to-combine-channels/
     training_expressions
-        .map { [it.toString().split('2000-')[1].split('-50/ExpressionData.csv')[0], it] }
+        .map { [it.toString().split('2000-')[1].split('/ExpressionData.csv')[0], it] }
         .set { expressiontrain_key }
     testing_expressions
-        .map { [it.toString().split('2000-')[1].split('-70/ExpressionData.csv')[0], it] }
+        .map { [it.toString().split('2000-')[1].split('-50/ExpressionData.csv')[0], it] }
         .set { expressiontest_key }
     groundtruth
-        .map { [it.toString().split('2000-')[1].split('-50/refNetwork.csv')[0], it] }
+        .map { [it.toString().split('2000-')[1].split('/refNetwork.csv')[0], it] }
         .set { groundtruth_key }
     ch_inputs = expressiontrain_key
         .join(expressiontest_key, by:0)
         .join(groundtruth_key, by:0)
+
 
     //STEP 2: Run all clean ups on it (including getting reference networks)
 
@@ -50,53 +51,54 @@ workflow{
         genie_research,
         ch_inputs
     )
+    ch_inputs.view()
 
     //STEP 3: Run EB on the 50 file (using no priors)
     
     //This will create a tuple with the following values
     // (ID, converted testing data, truth matrix, gene names, genie3 outputs)
-    genie3_ch = GENIE(
-        genie_script,
-        convert_ch
-    )
+    // genie3_ch = GENIE(
+    //     genie_script,
+    //     convert_ch
+    // )
 
-    //STEP 4: Normalise the output and put reference network in a matrix
+    // //STEP 4: Normalise the output and put reference network in a matrix
 
-    //This will create a tuple with the following values
-    // (ID, converted testing data, truth matrix, gene names, prior matrix)
+    // //This will create a tuple with the following values
+    // // (ID, converted testing data, truth matrix, gene names, prior matrix)
 
-    prior_ch = GENIE_CONVERSION(
-        genie_con_gene,
-        genie3_ch
-    )
+    // prior_ch = GENIE_CONVERSION(
+    //     genie_con_gene,
+    //     genie3_ch
+    // )
 
 
-    //STEP 5: With the reference network, run EB again, this time on the 70 data using 50 prior
+    // //STEP 5: With the reference network, run EB again, this time on the 70 data using 50 prior
 
-    //Firstly convert the training data into something worthwhile
-    prior_ch = EB_CONVERT(
-        input_fix,
-        prior_ch
-    )
+    // //Firstly convert the training data into something worthwhile
+    // prior_ch = EB_CONVERT(
+    //     input_fix,
+    //     prior_ch
+    // )
 
-    //Secondly combine with the pi0 values
-    prior_ch = prior_ch.combine(pi0)
+    // //Secondly combine with the pi0 values
+    // prior_ch = prior_ch.combine(pi0)
 
-    //Run Empirical Bayes
-    //This will return a tuple of the following nature
-    // (Id, true network, gene list, pi0 value used, the EB network)
-    eb_ch = EB_RUN(
-        eb_run,
-        eb_tuple,
-        prior_ch
-    )
+    // //Run Empirical Bayes
+    // //This will return a tuple of the following nature
+    // // (Id, true network, gene list, pi0 value used, the EB network)
+    // eb_ch = EB_RUN(
+    //     eb_run,
+    //     eb_tuple,
+    //     prior_ch
+    // )
 
-    //STEP 6: Return all of the metrics
-    //Returns 18 metrics
-    METRICS(
-        metrics_mich,
-        eb_ch
-    )
+    // //STEP 6: Return all of the metrics
+    // //Returns 18 metrics
+    // METRICS(
+    //     metrics_mich,
+    //     eb_ch
+    // )
 
 }
 

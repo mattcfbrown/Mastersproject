@@ -43,26 +43,37 @@ test_statistics = [e.weight for e in edge_list]
 #------------------------------------------Priors----------------------------------------------
 
 prior_file = DataFrame(CSV.File(prior_data, header= false))
-prior_file = Matrix(prior_file)
+# prior_file = Matrix(prior_file)
 
 #Now generates a dictionary of the prior information
 num_genes = length(genes)
 #Generate the names of the gene
-gene_names = []
-for i in 0:(num_genes-1)
-    cur_gene = string("T", i)
-    push!(gene_names,cur_gene)
+# gene_names = []
+# for i in 0:(num_genes-1)
+#     cur_gene = string("T", i)
+#     push!(gene_names,cur_gene)
+# end
+# #Builds the dictionary
+# priors = Dict()
+# for i in gene_names
+#     for j in gene_names
+#         edge1 = parse(Int,i[2:end]) + 1
+#         edge2 = parse(Int,j[2:end]) + 1
+#         priors[(i,j)] = prior_file[edge1,edge2]*2.2
+#     end
+# end
+
+#We convert this into a matrix
+full_matrix = Dict()
+for i in 1:nrow(prior_file)
+    edge1 = parse(Int,prior_file[i,1][2:end]) + 1
+    edge1_name = join(["T", string(edge1)])
+    edge2 = parse(Int,prior_file[i,2][2:end]) + 1
+    edge2_name = join(["T", string(edge2)])
+    full_matrix[(edge1_name,edge2_name)] = prior_file[i,3]
 end
-#Builds the dictionary
-priors = Dict()
-for i in gene_names
-    for j in gene_names
-        edge1 = parse(Int,i[2:end]) + 1
-        edge2 = parse(Int,j[2:end]) + 1
-        priors[(i,j)] = prior_file[edge1,edge2]*2.2
-    end
-end
-prior_list = [ get(priors, to_index(e.nodes), 0) for e in edge_list ]
+
+prior_list = [ get(full_matrix, to_index(e.nodes), 0) for e in edge_list ]
 
 
 #----------------------------------Where the magic happens--------------------------------------
@@ -74,17 +85,19 @@ mixture_pdf = fit_mixture_distribution(midpoints, counts, bin_width) #Mixture is
 #--------------------------------Method to test now-------------------------------------------
 
 # Prior function
-function prior_fn(x) 
-    if x == 0
-        exp(w0) / ( exp(w0) + exp(x) )
-    elseif 0 < x < 0.1
-        exp(w0) / ( exp(w0) + 0*exp(x) )
-    elseif 0.1 <= x < 0.5
-        exp(w0) / ( exp(w0) + multi*0.5*exp(x) )        
-    else
-        exp(w0) / ( exp(w0) + multi*exp(x) )       
-    end        
-end
+# function prior_fn(x) 
+#     if x == 0
+#         exp(w0) / ( exp(w0) + exp(x) )
+#     elseif 0 < x < 0.1
+#         exp(w0) / ( exp(w0) + 0*exp(x) )
+#     elseif 0.1 <= x < 0.5
+#         exp(w0) / ( exp(w0) + multi*0.5*exp(x) )        
+#     else
+#         exp(w0) / ( exp(w0) + multi*exp(x) )       
+#     end        
+# end
+
+prior_fn(x) = exp(w0) / ( exp(w0) + exp(x) )
 
 num_test_statistics = length(test_statistics)
 posterior = Array{Float64}(undef, num_test_statistics)
@@ -137,6 +150,6 @@ end
 
 #writes the file to a matrix
 num_cells = Values[4]
-# type = Values[5]
-name = join(["Eb_matrix_", num_cells, ".csv"])
+type = Values[5]
+name = join(["EB_", num_cells, "_", type,".csv"])
 writedlm( name,  matrix, ',')

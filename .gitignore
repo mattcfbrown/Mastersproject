@@ -13,3 +13,5 @@ geneci_python/env/
 test/env
 /Pipelines/GENCI_nextflow_pipeline/Data
 /Imported_motifs
+/Imported_beeline
+/Pipelines/weightings
