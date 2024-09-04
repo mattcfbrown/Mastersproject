@@ -16,9 +16,15 @@ onlyfiles = [f for f in listdir(path) if isfile(join(path, f))]
 eb_full = sys.argv[2]
 eb_ten = sys.argv[3]
 eb_boot = sys.argv[8]
+eb_five = sys.argv[9]
+eb_boot_zero = sys.argv[11]
+eb_zero = sys.argv[12]
 onlyfiles.append(eb_full)
 onlyfiles.append(eb_ten)
+onlyfiles.append(eb_five)
 onlyfiles.append(eb_boot)
+onlyfiles.append(eb_boot_zero)
+onlyfiles.append(eb_zero)
 
 #We now read in the ground truth network
 original = sys.argv[4]
@@ -33,8 +39,10 @@ id = sys.argv[5]
 
 ensemble_full = sys.argv[6]
 ensemble_ten = sys.argv[7]
+ensemble_five = sys.argv[10]
 onlyfiles.append(ensemble_full)
 onlyfiles.append(ensemble_ten)
+onlyfiles.append(ensemble_five)
 
 arrays = []    #Holds all the arrays used
 names = []     #Holds the names of the methods
@@ -58,6 +66,7 @@ for method in onlyfiles:
     name = name.replace("_" + id, "")
     name = name.replace("genci_input_folder/all/final_list", "ensemble_all")
     name = name.replace("genci_input_folder/top_10/final_list", "ensemble_ten")
+    name = name.replace("genci_input_folder/top_5/final_list", "ensemble_five")
     print(name)
     names.append(name)
 
@@ -71,12 +80,24 @@ for method in onlyfiles:
     elif name == 'EB_bootstrapping':
         matrix = np.genfromtxt(eb_boot, delimiter=',',
                         dtype=None)
+    elif name == 'EB_five':
+        matrix = np.genfromtxt(eb_five, delimiter=',',
+                        dtype=None)
+    elif name == 'EB_zero':
+        matrix = np.genfromtxt(eb_zero, delimiter=',',
+                        dtype=None)
+    elif name == 'EB_bootstrapping_zero':
+        matrix = np.genfromtxt(eb_boot_zero, delimiter=',',
+                        dtype=None)
     else:
         if name == 'ensemble_all':
             file = np.genfromtxt(ensemble_full, delimiter=',',
                         dtype=None)
         elif name == 'ensemble_ten':
             file = np.genfromtxt(ensemble_ten, delimiter=',',
+                        dtype=None)
+        elif name == 'ensemble_five':
+            file = np.genfromtxt(ensemble_five, delimiter=',',
                         dtype=None)
         else:
             file = np.genfromtxt(path + '/' + method, delimiter=',',

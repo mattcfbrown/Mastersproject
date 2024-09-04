@@ -38,14 +38,14 @@ prior_data = Values[3]
 type = Values[4]
 to_keep = parse(Float64, Values[5])
 if Values[6] == "gam"
-    dist = :Gamma
+    dist = :Normal
 elseif Values[6] == "normal"
     dist = :Normal
 end
 if Values[7] == "PUC"
     inference = PUCNetworkInference()
 elseif Values[7] == "MI"
-    inference = MINetworkInference()
+    inference = PUCNetworkInference()
 end
 # w0 = parse(Float64, Values[8])
 w0 = 2.2

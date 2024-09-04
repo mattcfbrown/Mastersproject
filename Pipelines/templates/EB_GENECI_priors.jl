@@ -4,6 +4,7 @@ using NetworkInference
 using EmpiricalBayes
 using DelimitedFiles
 using DataFrames, CSV
+using Distributions
 
 #This function is used in the Empirical Bayes framework
 function to_index(label1::AbstractString, label2::AbstractString)
@@ -21,6 +22,63 @@ end
 function to_index(nodes::Array{Node, 1})
     n1, n2 = nodes
     return to_index(n1.label, n2.label)
+end
+
+function get_distr(d::Symbol)
+    distrs = Dict(
+        :Gamma => Gamma,
+        :Normal => Normal
+    )
+    return distrs[d]
+end
+
+
+function prior_eb(test_statistics, priors, num_bins, distr, proportion_to_keep, w0)
+    midpoints, counts, bin_width = discretize_test_statistics(test_statistics, num_bins)
+    null_distr = fit_null_distribution(midpoints, counts, num_bins, bin_width, proportion_to_keep, get_distr(distr))
+    mixture_pdf = fit_mixture_distribution(midpoints, counts, bin_width)
+
+    #From here we will be analysing the Posterior calculation
+    null_pdf(x) = pdf(null_distr, x)
+    multi = 10
+
+    function prior_fn(x) 
+        if x == 0*2.2
+            exp(w0) / ( exp(w0) + exp(x) )
+        elseif 0 < x < 0.1*2.2
+            exp(w0) / ( exp(w0) + 0*exp(x) )
+        elseif 0.1*2.2 <= x < 0.5*2.2
+            exp(w0) / ( exp(w0) + multi*0.5*exp(x) )        
+        else
+            exp(w0) / ( exp(w0) + multi*exp(x) )       
+        end        
+    end
+
+
+    #We hold the values here
+    num_test_statistics = length(test_statistics)
+    null_val = Array{Float64}(undef, num_test_statistics)
+    mix_val = Array{Float64}(undef, num_test_statistics)
+    posterior = Array{Float64}(undef, num_test_statistics)
+
+    #Here is where the magic happens
+    for i in 1:num_test_statistics
+        ts = test_statistics[i]
+        prior_val = prior_fn(priors[i])
+        null_val[i] = null_pdf(ts)
+        mix_val[i] = mixture_pdf(ts)
+
+        # if mixture distr equals 0, then just return a 0 posterior
+        if mix_val[i] == zero(mix_val[i])
+            posterior[i] = 0.0
+            continue
+        end
+
+        fdr = null_val[i] / mix_val[i]
+        p1 = 1 - prior_val * fdr
+        posterior[i] = p1
+    end
+    return posterior
 end
 
 #Input and important values
@@ -92,10 +150,10 @@ proportion_to_keep = 0.9
 tail = :two
 w0 = 2.2
 
-posteriors_full = empirical_bayes(test_statistics, full_list, num_bins, distr, proportion_to_keep = proportion_to_keep, tail = tail, w0 = w0)
-posteriors_ten = empirical_bayes(test_statistics, ten_list, num_bins, distr, proportion_to_keep = proportion_to_keep, tail = tail, w0 = w0)
-posteriors_five = empirical_bayes(test_statistics, five_list, num_bins, distr, proportion_to_keep = proportion_to_keep, tail = tail, w0 = w0)
-posteriors_zero = empirical_bayes(test_statistics, zero_list, num_bins, distr, proportion_to_keep = proportion_to_keep, tail = tail, w0 = w0)
+posteriors_full = prior_eb(test_statistics, full_list, num_bins, distr, proportion_to_keep, w0)
+posteriors_ten = prior_eb(test_statistics, ten_list, num_bins, distr, proportion_to_keep, w0)
+posteriors_five = prior_eb(test_statistics, five_list, num_bins, distr, proportion_to_keep, w0)
+posteriors_zero = prior_eb(test_statistics, zero_list, num_bins, distr, proportion_to_keep, w0)
 
 
 #List to hold edges

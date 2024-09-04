@@ -1,3 +1,6 @@
+//This will essentially be the same workflow as before, except with the alternate prior information
+//I just need to write a function for EB
+
 //This file will run GENECI and produce outputs
 //At the moment I want to make sure it works for one run before I start to increase the complexity of the program
 
@@ -5,9 +8,9 @@
 
 geneci_convert = file( params.geneci_convert )
 input_fix      = file( params.input_fix )
-eb_geneci      = file( params.eb_geneci )
+eb_geneci      = file( params.eb_genci_prior )
 metrics        = file( params.metrics )
-bootstrap      = file( params.bootstrap )
+bootstrap      = file( params.prior_boot )
 
 workflow{
 
@@ -79,79 +82,11 @@ workflow{
     )
 }
 
-//This converts the data into something we can use
-process GENECI_FORMAT {
-
-    publishDir "${params.outdir}/converted_data/GENECI"
-    container 'nlnet_convert:latest'
-
-    input:
-    path script
-    tuple val(id), path(original_input), path(groundtruth)
-
-    output:
-    tuple val(id), path(original_input), path("genci_input_${id}.csv"), path(groundtruth)
-
-    script:
-    """
-    python3 ${script} ${original_input} ${id}
-    """
-}
-
-//This gives outputs based on GENECI
-process INFERENCE {
-
-    publishDir "${params.outdir}"
-
-    input:
-    tuple val(id), path(original_input), path(geneci_input), path(groundtruth)
-
-    output:
-    tuple val(id), path(original_input), path(groundtruth), path("inference/${id}_folder")
-
-    script:
-    """
-    source /Users/mbrown/Desktop/Research/Mastersproject/geneci_python/env/bin/activate
-
-    geneci infer-network --expression-data ${geneci_input} \
-                         --technique PIDC --technique CLR --technique GENIE3_RF\
-                         --output-dir inference/${id}_folder
-    """
-
-}
-
-// This runs the optimisation algorithm needed
-process OPTIMISE{
-
-    publishDir "${params.outdir}"
-
-    input:
-    tuple val(id), path(original_input), path(groundtruth), path(inference_path)
-
-    output:
-    tuple val(id), path(original_input), path(groundtruth), path(inference_path), path("optimised/${id}_opti")
-
-    script:
-    """
-    source /Users/mbrown/Desktop/Research/Mastersproject/geneci_python/env/bin/activate
-
-    geneci optimize-ensemble --confidence-list ${inference_path}/genci_input_${id}/lists/GRN_PIDC.csv \
-                             --confidence-list ${inference_path}/genci_input_${id}/lists/GRN_CLR.csv \
-                             --confidence-list ${inference_path}/genci_input_${id}/lists/GRN_GENIE3_RF.csv \
-                             --crossover-probability 0.9 --mutation-probability 0.05 --population-size 100 \
-                             --num-parents 3 --mutation-strength 0.1 \
-                             --num-evaluations 1000 --cut-off-criteria PercLinksWithBestConf --cut-off-value 0.4 \
-                             --function Quality \
-                             --algorithm GA \
-                             --output-dir optimised/${id}_opti
-
-    """
-}
 
 //Here we convert the input file into something more EB friendly
 process EB_CONVERT{
 
-    publishDir "${params.outdir}/EB/formatted"
+    publishDir "${params.outdir}/prior/EB/formatted"
 
     //ID, outputs of the grn, optimised ensemble network, input file, ground truth
 
@@ -174,8 +109,8 @@ process EB_CONVERT{
 //This program here runs Empirical Bayes
 process EB_RUN {
 
-    container 'empiricalbayes:latest'
-    publishDir "${params.outdir}/EB/EB_output"
+    container 'eb_bootstrap:latest'
+    publishDir "${params.outdir}/prior/EB/EB_output"
 
     input:
     path script
@@ -202,7 +137,7 @@ process EB_RUN {
 process METRICS {
 
     container 'metrics:latest'
-    publishDir "${params.outdir}/metrics"
+    publishDir "${params.outdir}/prior/metrics"
 
     input:
     path script
@@ -229,7 +164,7 @@ process METRICS {
 process BOOTSTRAPPING{
 
     container 'eb_bootstrap:latest'
-    publishDir "${params.outdir}/EB/bootstrapping"
+    publishDir "${params.outdir}/prior/EB/bootstrapping"
 
     input:
     path script

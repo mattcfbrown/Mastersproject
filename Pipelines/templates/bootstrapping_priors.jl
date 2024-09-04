@@ -66,7 +66,6 @@ function EB_running(data_matrix,sample_num,prior_matrix,zero_matrix,p_val)
     #Running EB
     num_bins = 5
     distr = :Normal
-    tail = :two
     w0 = 2.2
 
 
@@ -80,8 +79,48 @@ function EB_running(data_matrix,sample_num,prior_matrix,zero_matrix,p_val)
     distr = get_distr(distr)
     null_distr = distr(norm_mean,norm_sigma)
     mixture_pdf = fit_mixture_distribution(midpoints, counts, bin_width)
-    posteriors_prior = calculate_posterior(test_statistics, prior_list, null_distr, mixture_pdf, tail, w0=w0, null_value = -Inf)
-    posteriors_zero = calculate_posterior(test_statistics, zero_list, null_distr, mixture_pdf, tail, w0=w0, null_value = -Inf)
+
+
+    #From here we will be analysing the Posterior calculation
+    null_pdf(x) = pdf(null_distr, x)
+    multi = 10
+
+    function prior_fn(x) 
+        if x == 0
+            exp(w0) / ( exp(w0) + exp(x) )
+        elseif 0 < x < 0.1
+            exp(w0) / ( exp(w0) + 0*exp(x) )
+        elseif 0.1 <= x < 0.5
+            exp(w0) / ( exp(w0) + multi*0.5*exp(x) )        
+        else
+            exp(w0) / ( exp(w0) + multi*exp(x) )       
+        end        
+    end
+
+    num_test_statistics = length(test_statistics)
+    posteriors_prior = Array{Float64}(undef, num_test_statistics)
+    posteriors_zero = Array{Float64}(undef, num_test_statistics)
+
+    #Here is where the magic happens
+    for i in 1:num_test_statistics
+        ts = test_statistics[i]
+        prior_val = prior_fn(prior_list[i])
+        zero_val = prior_fn(zero_list[i])
+        null_val = null_pdf(ts)
+        mix_val = mixture_pdf(ts)
+
+        # if mixture distr equals 0, then just return a 0 posterior
+        if mix_val == zero(mix_val)
+            posteriors_prior[i] = 0.0
+            posteriors_zero[i] = 0.0
+            continue
+        end
+
+        fdr = null_val / mix_val
+        p1 = 1 - prior_val * fdr
+        posteriors_prior[i] = p1
+        posteriors_zero[i] = 1 - zero_val*fdr
+    end
     #-------------------------------Finished running EB-------------------------------------------------------------
 
 

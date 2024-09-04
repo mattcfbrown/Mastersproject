@@ -13,6 +13,7 @@ genie3_nor     = file( params.genie3_nor )
 genie3_nor_cor = file( params.genie3_nor_cor )
 NI_script      = file( params.NI_script )
 NI_con_scr     = file( params.NI_convert )
+normalised     = file( params.normalised)
 
 //All the datasets needed
 gene_read25_cells100   = file( params.g_r25c100 )            //100 Cells
@@ -86,6 +87,7 @@ threshold = 0.1
 workflow {
 
     CELL100(
+        normalised,
         gene_read25_cells100,
         zero_info25,
         cells_test_orig,
@@ -110,6 +112,7 @@ workflow {
     )
 
     MESSY100(
+        normalised,
         messy100,
         zero_info25,
         cells_test_orig,
@@ -134,6 +137,7 @@ workflow {
     )
 
     CELL250(
+        normalised,
         gene_read25_cells250,
         zero_info25,
         cells_test_orig,
@@ -158,6 +162,7 @@ workflow {
     )
 
     MESSY250(
+        normalised,
         messy250,
         zero_info25,
         cells_test_orig,
@@ -182,6 +187,7 @@ workflow {
     )
     
     CELL500(
+        normalised,
         gene_read25_cells500,
         zero_info25,
         cells_test_orig,
@@ -206,6 +212,7 @@ workflow {
     )
     
     MESSY500(
+        normalised,
         messy500,
         zero_info25,
         cells_test_orig,
@@ -230,6 +237,7 @@ workflow {
     )
 
     CELL1000(
+        normalised,
         gene_read25_cells1000,
         zero_info25,
         cells_test_orig,
@@ -254,6 +262,7 @@ workflow {
     )
 
     MESSY1000(
+        normalised,
         messy1000,
         zero_info25,
         cells_test_orig,
@@ -280,6 +289,7 @@ workflow {
     //This is the 2000 cells test
 
     CELL2000(
+        normalised,
         gene_read25_cells2000,
         zero_info25,
         cells_test_orig,
@@ -304,6 +314,7 @@ workflow {
     )
 
     MESSY2000(
+        normalised,
         messy2000,
         zero_info25,
         cells_test_orig,

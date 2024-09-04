@@ -1,13 +1,30 @@
-FROM --platform=linux/amd64 python:3.9.2
+FROM julia:1.9-buster
 
-RUN apt-get update
-RUN apt-get -y install apt-transport-https ca-certificates curl gnupg2 software-properties-common
-RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
-RUN add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
+LABEL image.author.name "Matthew Brown"
+LABEL image.author.email "brownmc@student.unimelb.edu.au"
 
-RUN apt-get update
-RUN apt-get -y install docker-ce
+RUN apt-get update && apt-get install -y procps
+
+RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
+    julia -e 'using Pkg; Pkg.add("Adapt");'
+
+RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
+    julia -e 'using Pkg; Pkg.add("NetworkInference");'
+
+RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
+    julia -e 'using Pkg; Pkg.develop(url="https://github.com/ananth-pallaseni/EmpiricalBayes.jl");'
+
+RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
+    julia -e 'using Pkg; Pkg.add("CSV");'
+
+RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
+    julia -e 'using Pkg; Pkg.add("DataFrames");'
+
+RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
+    julia -e 'using Pkg; Pkg.add("DelimitedFiles");'
+
+RUN JULIA_DEPOT_PATH=/Applications/Julia-1.9.app/Contents/Resources/julia/share/julia \
+    julia -e 'using Pkg; Pkg.add("Distributions");'
 
 
-RUN pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir geneci==2.0.1 numpy==1.26.4 requests==2.29.0
+
