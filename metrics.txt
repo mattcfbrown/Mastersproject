@@ -1,0 +1,59 @@
+MCC score: 
+
+No priors: 0.0
+Full priors: 0.0
+GENIE3 priors: 0.0
+GENIE3: 0.7961083412006617
+Nlnet priors: 0.0
+
+F1 score: 
+
+No priors: 0.0
+Full priors: 0.0
+GENIE3 priors: 0.0
+GENIE3: 0.8
+Nlnet priors: 0.0
+
+AUPR score: 
+
+No priors: 0.5416
+Full priors: 0.5416
+GENIE3 priors: 0.5416
+GENIE3: 0.8326380566801619
+Nlnet priors: 0.5416
+
+No priors connection information
+
+Found: 0
+Incorrect: 0
+Missed: 26
+
+
+Full priors connection information
+
+Found: 0
+Incorrect: 0
+Missed: 26
+
+
+GENIE3 priors connection information
+
+Found: 0
+Incorrect: 0
+Missed: 26
+
+
+GENIE3 connection information
+
+Found: 18
+Incorrect: 1
+Missed: 8
+
+
+Nlnet priors connection information
+
+Found: 0
+Incorrect: 0
+Missed: 26
+
+

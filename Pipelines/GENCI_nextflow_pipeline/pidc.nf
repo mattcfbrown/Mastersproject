@@ -6,6 +6,7 @@
 input_fix      = file( params.input_fix )
 pidc           = file( params.pidc )
 metrics        = file( params.metrics )
+pidc_boot      = file( params.pidc_boot )
 
 workflow{
 
@@ -134,7 +135,7 @@ process EB_RUN_TEN {
 
     output:
     tuple val(id), path(output_path), path(optimise_path), path(groundtruth), 
-        path(eb_full), path("EB_${id}_${type}.csv")
+        path(eb_full), path("EB_${id}_${type}.csv"), path(input)
 
     script:
 
@@ -142,6 +143,32 @@ process EB_RUN_TEN {
     julia ${script} ${input} \
           ${optimise_path}/top_10/final_list.csv \
           ${p_val} ${id} ${type}
+    """
+}
+
+//Bootstrapping process
+process BOOTSTRAPPING{
+
+    container 'eb_bootstrap:latest'
+    publishDir "${params.outdir}/PIDC/EB/bootstrapping"
+
+    input:
+    path script
+    val p_val
+    tuple val(id), path(output_path), path(optimise_path), path(groundtruth), 
+        path(eb_full), path(eb_ten), path(input)
+    
+    output:
+    tuple val(id), path(output_path), path(optimise_path), 
+        path("EB_${id}_bootstrapping.csv"), path("EB_${id}_bootstrapping_zero.csv"),
+            path(groundtruth), path(eb_full), path(eb_ten)
+
+    script:
+    """
+    julia -t 4 ${script} ${input} \
+          ${optimise_path}/all/final_list.csv \
+          ${p_val} \
+          ${id} \
     """
 }
 
@@ -153,8 +180,9 @@ process METRICS {
 
     input:
     path script
-    tuple val(id), path(output_path), path(optimise_path), path(groundtruth), 
-        path(eb_full), path(eb_ten)
+    tuple val(id), path(output_path), path(optimise_path), 
+        path(eb_boot), path(eb_boot_zero),
+            path(groundtruth), path(eb_full), path(eb_ten)
 
     output:
     path "Metrics_${id}.txt"
@@ -165,6 +193,9 @@ process METRICS {
             ${eb_full} ${eb_ten} \
             ${groundtruth} ${id} \
             ${optimise_path}/all/final_list.csv \
-            ${optimise_path}/top_10/final_list.csv 
+            ${optimise_path}/top_10/final_list.csv \
+            ${eb_boot} \
+            ${eb_boot_zero} ${eb_zero} \
     """
 }
+

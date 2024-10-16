@@ -140,12 +140,14 @@ for (i in 1:n) {
 #Saves it as a .csv file
 library("MASS")
 mat <- (1.0-gene.fdr.mat)
+max_mat <- max(mat)
+min_mat <- min(mat)
 for (i in 1:n){
   for (j in i:n) {
     c_1 = mat[i,j]
     c_2 = mat[j,i]
-    mat[i,j] = max(c_1,c_2)
-    mat[j,i] = max(c_1,c_2)    
+    mat[i,j] = (max(c_1,c_2) - min_mat)/(max_mat-min_mat)
+    mat[j,i] = (max(c_1,c_2) - min_mat)/(max_mat-min_mat)
   }
 }
 write.matrix(mat,file="nlnet_scores.csv")

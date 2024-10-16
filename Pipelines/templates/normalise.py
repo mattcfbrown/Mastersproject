@@ -3,6 +3,7 @@
 import numpy as np
 from math import log
 import sys
+from sklearn.decomposition import PCA
 
 path = sys.argv[1]
 data = np.genfromtxt(path, dtype=None, delimiter='\t')
@@ -24,10 +25,14 @@ for i in range(len(data)):
             new[i][index] = log((data[i][j]/columnsum[j]) + 1)
             index = index + 1
 
+pca = PCA(n_components=0.8, svd_solver='full')
+principalComponents = pca.fit_transform(new)
+
+
 cells = sys.argv[2]
 
 name = 'normalised_file_' + cells + '.txt'
 
-np.savetxt(name,new,delimiter='\t')
+np.savetxt(name,principalComponents,delimiter='\t')
 
 

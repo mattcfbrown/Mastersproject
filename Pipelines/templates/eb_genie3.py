@@ -30,6 +30,11 @@ for line in lines[1:]:
         vals.append(gene_ID)
     data.append(vals)
 
+numbers = []
+for x in data:
+    numbers.append(float(x[2]))
+max = max(numbers)
+min = min(numbers)
 
 matrix = np.zeros((num_genes,num_genes))
 
@@ -37,6 +42,6 @@ matrix = np.zeros((num_genes,num_genes))
 for x in data:
     val1 = int(x[0]) - 1
     val2 = int(x[1]) - 1
-    matrix[val1][val2] = float(x[2])
+    matrix[val1][val2] = (float(x[2])-min)/(max-min)
 
 np.savetxt("matrix_genie_eb.csv", matrix, delimiter=",")

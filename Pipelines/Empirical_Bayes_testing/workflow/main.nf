@@ -34,7 +34,7 @@ include { INFORMATION_MEASURES as INFORMATION_MEASURES} from './modules'
 
 workflow PRIOR_WORKFLOW {
     take:
-    normalised                                  //The normalised script
+    // normalised                                  //The normalised script
     reads                                      //The RNA sequencing reads
     null_prior                                //CSV file full of zeros, no info provided
     known_network                            //The known GRN
@@ -58,15 +58,15 @@ workflow PRIOR_WORKFLOW {
     genie_con_nor          //This script converts the GENIE3 output into something which can be measured
 
     main:
-    norm_reads = NORMALISE(
-        normalised,
-        reads,
-        num_cells
-    )
+    // norm_reads = NORMALISE(
+    //     normalised,
+    //     reads,
+    //     num_cells
+    // )
 
     //Run with no prior information
     no_prior = NO_PRIORS(
-        norm_reads,
+        reads,
         null_prior,
         p_value,
         eb_input_fix,
@@ -79,7 +79,7 @@ workflow PRIOR_WORKFLOW {
     )
     //Run with complete prior information
     full_prior = FULL_PRIORS(
-        norm_reads,
+        reads,
         known_network,
         p_value,
         eb_input_fix,
@@ -90,72 +90,72 @@ workflow PRIOR_WORKFLOW {
         inference,
         num_cells
     )
-    // //Gets genie3 prior information
-    // genie3_info = GENIE3_EB(
-    //     norm_reads,
-    //     eb_genie,
-    //     genie3_con,
-    //     num_genes
-    // )
-    // //Now performs an empirical Bayes analysis
-    // genie3_prior = GENIE3_PRIORS(
-    //     norm_reads,
-    //     genie3_info,
-    //     p_value,
-    //     eb_input_fix,
-    //     bayes_script,
-    //     type[2],
-    //     keep,
-    //     gam_or_norm,
-    //     inference,
-    //     num_cells
-    // )
-    // //We now do the same thing for nlnet
-    // nlnet_info = NLNET(
-    //     norm_reads,
-    //     nlnet_script
-    // )
-    // //Now gets the NLNET prior
-    // nlnet_prior = NLNET_PRIORS(
-    //     norm_reads,
-    //     nlnet_info,
-    //     p_value,
-    //     eb_input_fix,
-    //     bayes_script,
-    //     type[3],
-    //     keep,
-    //     gam_or_norm,
-    //     inference,
-    //     num_cells
-    // )
+    //Gets genie3 prior information
+    genie3_info = GENIE3_EB(
+        reads,
+        eb_genie,
+        genie3_con,
+        num_genes
+    )
+    //Now performs an empirical Bayes analysis
+    genie3_prior = GENIE3_PRIORS(
+        reads,
+        genie3_info,
+        p_value,
+        eb_input_fix,
+        bayes_script,
+        type[2],
+        keep,
+        gam_or_norm,
+        inference,
+        num_cells
+    )
+    //We now do the same thing for nlnet
+    nlnet_info = NLNET(
+        reads,
+        nlnet_script
+    )
+    //Now gets the NLNET prior
+    nlnet_prior = NLNET_PRIORS(
+        reads,
+        nlnet_info,
+        p_value,
+        eb_input_fix,
+        bayes_script,
+        type[3],
+        keep,
+        gam_or_norm,
+        inference,
+        num_cells
+    )
 
-    // genie3_normal = GENIE3(
-    //     norm_reads,
-    //     genie_script,
-    //     genie_con_nor,
-    //     threshold,
-    //     num_genes
-    // )
+    genie3_normal = GENIE3(
+        reads,
+        genie_script,
+        genie_con_nor,
+        threshold,
+        num_genes
+    )
 
-    // ni_normal = INFORMATION_MEASURES(
-    //     norm_reads,
-    //     eb_input_fix,
-    //     NI_script,
-    //     NI_con_scr,
-    //     threshold,
-    //     num_genes,
-    //     num_cells   
-    // )
+    ni_normal = INFORMATION_MEASURES(
+        reads,
+        eb_input_fix,
+        NI_script,
+        NI_con_scr,
+        threshold,
+        num_genes,
+        num_cells   
+    )
 
     //Performs a metric analysis
     METRICS(
         metric_eb,
         no_prior,
         full_prior,
-        // genie3_prior,
-        // nlnet_prior,
-        // ni_normal,
-        // genie3_normal,
+        genie3_prior,
+        nlnet_prior,
+        ni_normal,
+        genie3_normal,
         known_network,
         num_genes,
         num_cells
@@ -231,16 +231,16 @@ workflow {
 process METRICS {
 
     container 'metrics:latest'
-    publishDir "${params.outdir}/metrics"
+    publishDir "${params.outdir}/beeline/metrics"
 
     input:
     path script
     path no_prior
     path full_prior
-    // path genie_prior
-    // path nlnet_prior
-    // path ni_normal
-    // path genie3_normal
+    path genie_prior
+    path nlnet_prior
+    path ni_normal
+    path genie3_normal
     path original
     val num_genes
     val num_cells
@@ -252,7 +252,7 @@ process METRICS {
     script:
 
     """
-    python3 ${script} ${no_prior} ${full_prior} ${original} ${num_genes} ${num_cells}
+    python3 ${script} ${no_prior} ${full_prior} ${genie_prior} ${nlnet_prior} ${ni_normal} ${genie3_normal} ${original} ${num_genes} ${num_cells}
     """    
 
 }

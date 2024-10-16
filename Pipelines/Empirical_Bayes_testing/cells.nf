@@ -28,8 +28,8 @@ messy500               = file( params.messy500 )             //Messy data 500 ce
 messy1000              = file( params.messy1000 )            //Messy data 1000 cells
 messy2000              = file( params.messy2000 )            //Messy data 2000 cells
 
-zero_info25_old        = file( params.no_prior )             //This is the zero file
-zero_info25            = file( params.half )                 //This is the 0.5 prior file, it has be written with this name so I do not have to edit the workflows below
+zero_info25        = file( params.no_prior )             //This is the zero file
+zero_info25_old            = file( params.half )                 //This is the 0.5 prior file, it has be written with this name so I do not have to edit the workflows below
 cells_test_orig        = file( params.gene_orig25 )          //This is the original file 
 
 clean_test1            = file( params.clean_test1 )
@@ -73,9 +73,9 @@ include { PRIOR_WORKFLOW as MESSY_TEST_4 } from './workflow'
 
 
 //All the Important floating variables
-p_value   = 0.75
+p_value   = 0.999833333
 num_genes = 25
-keep = [1.0,1.0,0.9,0.9,0.9]
+keep = [1.0,0.8,0.8,0.8,0.8]
 type = ["no_priors", "full_priors", "genie3_priors", "nlnet_priors"]
 num_cells = [100,250,500,1000,2000]
 dist = ["gam","gam","normal","normal","normal"]
@@ -87,7 +87,7 @@ threshold = 0.1
 workflow {
 
     CELL100(
-        normalised,
+        // normalised,
         gene_read25_cells100,
         zero_info25,
         cells_test_orig,
@@ -112,7 +112,7 @@ workflow {
     )
 
     MESSY100(
-        normalised,
+        // normalised,
         messy100,
         zero_info25,
         cells_test_orig,
@@ -124,7 +124,7 @@ workflow {
         metric_EB,
         num_genes,
         type,
-        0.7,
+        keep[0],
         "Messy_100",
         dist[2],
         null_type[2],
@@ -137,7 +137,7 @@ workflow {
     )
 
     CELL250(
-        normalised,
+        // normalised,
         gene_read25_cells250,
         zero_info25,
         cells_test_orig,
@@ -162,7 +162,7 @@ workflow {
     )
 
     MESSY250(
-        normalised,
+        // normalised,
         messy250,
         zero_info25,
         cells_test_orig,
@@ -187,7 +187,7 @@ workflow {
     )
     
     CELL500(
-        normalised,
+        // normalised,
         gene_read25_cells500,
         zero_info25,
         cells_test_orig,
@@ -212,7 +212,7 @@ workflow {
     )
     
     MESSY500(
-        normalised,
+        // normalised,
         messy500,
         zero_info25,
         cells_test_orig,
@@ -224,7 +224,7 @@ workflow {
         metric_EB,
         num_genes,
         type,
-        keep[3],
+        keep[2],
         "Messy_500",
         dist[3],
         null_type[3],
@@ -237,7 +237,7 @@ workflow {
     )
 
     CELL1000(
-        normalised,
+        // normalised,
         gene_read25_cells1000,
         zero_info25,
         cells_test_orig,
@@ -262,7 +262,7 @@ workflow {
     )
 
     MESSY1000(
-        normalised,
+        // normalised,
         messy1000,
         zero_info25,
         cells_test_orig,
@@ -289,7 +289,7 @@ workflow {
     //This is the 2000 cells test
 
     CELL2000(
-        normalised,
+        // normalised,
         gene_read25_cells2000,
         zero_info25,
         cells_test_orig,
@@ -314,7 +314,7 @@ workflow {
     )
 
     MESSY2000(
-        normalised,
+        // normalised,
         messy2000,
         zero_info25,
         cells_test_orig,

@@ -83,8 +83,7 @@ edge_list = network_EB.edges
 test_statistics = [e.weight for e in edge_list]
 prior_list = [ get(priors, to_index(e.nodes), 0) for e in edge_list ]
 
-#List where the edges will be stored
-eb_edges = Array{Edge}(undef, length(edge_list))
+
 
 #Now run Empirical Bayes
 num_bins = 5
@@ -92,34 +91,27 @@ distr = dist
 proportion_to_keep = to_keep
 tail = :two
 posteriors = empirical_bayes(test_statistics, prior_list, num_bins, distr, proportion_to_keep = proportion_to_keep, tail = tail, w0 = w0)
+print(posteriors)
 
+#List to hold edges
+edges = Array{Edge}(undef, length(edge_list))
+#We also want to get weighted values
+weighted = zeros(length(edge_list))
+#Gets the edges
 for i in 1:length(edge_list)
     nodes = edge_list[i].nodes
-    eb_edges[i] = Edge(nodes, posteriors[i])
+
+    edges[i] = Edge(nodes, posteriors[i])
+    weighted[i] = edges[i].weight
 end
 
-
-#Here I am going to print out the weights
-print(length(eb_edges))
-for i =1:length(eb_edges)
-    weight = eb_edges[i].weight
-    print(weight)
-    print("\n")
-end
-
-
-# Remove infinite values
-eb_edges = filter(x->isfinite(x.weight), eb_edges)
-#sorts by highest to lowest p value
-sort!(eb_edges, rev = true, by = x->x.weight)
-
-
+permvec = sortperm(weighted)
 #We now want to create a matrix which holds all the values
 matrix = zeros(Int,num_genes,num_genes)
-for i = 1:length(eb_edges)
-    edge1 = eb_edges[i].nodes[1].label
-    edge2 = eb_edges[i].nodes[2].label
-    weight = eb_edges[i].weight
+for i in reverse(permvec)
+    edge1 = edges[i].nodes[1].label
+    edge2 = edges[i].nodes[2].label
+    weight = edges[i].weight
     if weight < p_val
         break
     end

@@ -6,8 +6,8 @@ import re
 import math
 
 infile = sys.argv[1]
-num_genes = sys.argv[2]
-num_genes = int(num_genes)
+id = sys.argv[2]
+num_genes = 25
 
 #This produces a list containing all the values
 data = []
@@ -46,5 +46,5 @@ for x in data:
     val2 = int(x[1]) - 1
     matrix[val1][val2] = (float(x[2])-min)/(max-min)
 
-
-np.savetxt("matrix_genie_normalised.csv", matrix, delimiter=",")
+name = "matrix_genie_normalised_" + id + ".csv"
+np.savetxt(name, matrix, delimiter=",")

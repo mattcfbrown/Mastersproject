@@ -7,7 +7,7 @@ Values = ARGS
 #Gets the input
 genes = get_nodes(Values[1]);
 threshold = Values[2]
-network = InferredNetwork(PIDCNetworkInference(),genes);
+network = InferredNetwork(PUCNetworkInference(),genes);
 
 #open(Values[3], "w") do file
 #    write(file,network)
