@@ -173,7 +173,7 @@ orig_found_g_prior = [] #Connections not found by EB
 #Let's get the simulated and original ones
 for i in range(num_genes):
     for j in range(i,num_genes):
-        if nlnet_prior [i][j] == 1:
+        if genie_prior [i][j] == 1:
             sim_found_g_prior.append(gene_list[i] + ' --- ' + gene_list[j])
         if original[i][j] == 1:
             orig_found_g_prior.append(gene_list[i] + ' --- ' + gene_list[j])            

@@ -6,8 +6,8 @@ using Distributions
 
 #Data used
 # data = "/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/PIDC_testing/Data/shuffled.txt"
-# data = "/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/PIDC_testing/Data/indepenent.txt"
-data = "/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/Prior_testing/results/thesis/EB_formatted/formatted_data_250cells.txt"
+data = "/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/PIDC_testing/Data/indepenent.txt"
+# data = "/Users/mbrown/Desktop/Research/Mastersproject/Pipelines/Prior_testing/results/thesis/EB_formatted/formatted_data_250cells.txt"
 inference = PIDCNetworkInference()
 
 # #This file will aim to do the following:
@@ -52,7 +52,7 @@ midpoints, counts, bin_width = discretize_test_statistics(ten_removed, num_bins)
 
 #Step 3: Get histogram of the values used, plot the normal over the top
 num_edges = length(test_statistics)
-b_range = range(0,2, length = 30)
+b_range = range(0,2, length = 10)
 
 # plot(sort(test_statistics), (1:num_edges)./num_edges,
 # title = "PIDC", label = "PIDC CDF")

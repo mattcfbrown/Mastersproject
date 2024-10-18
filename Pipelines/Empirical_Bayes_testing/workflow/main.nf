@@ -231,7 +231,7 @@ workflow {
 process METRICS {
 
     container 'metrics:latest'
-    publishDir "${params.outdir}/beeline/metrics"
+    publishDir "${params.outdir}/SERGIO/metrics"
 
     input:
     path script

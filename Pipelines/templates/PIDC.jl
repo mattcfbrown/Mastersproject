@@ -110,7 +110,7 @@ mixture_pdf = fit_mixture_distribution(midpoints, counts, bin_width) #Mixture is
 #--------------------------------Method to test now-------------------------------------------
 
 # Prior function
-multi = 10
+multi = 1
 function prior_fn(x) 
     if x == 0
         exp(w0) / ( exp(w0) + exp(x) )

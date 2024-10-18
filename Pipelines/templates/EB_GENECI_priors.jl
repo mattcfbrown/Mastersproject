@@ -40,7 +40,7 @@ function prior_eb(test_statistics, priors, num_bins, distr, proportion_to_keep, 
 
     #From here we will be analysing the Posterior calculation
     null_pdf(x) = pdf(null_distr, x)
-    multi = 10
+    multi = 1
 
     function prior_fn(x) 
         if x == 0*2.2
@@ -147,6 +147,9 @@ zero_list = [ get(zero_matirx, to_index(e.nodes), 0) for e in edge_list ]
 num_bins = 5
 distr = :Normal
 proportion_to_keep = 0.8
+if (num_genes < 11)
+    proportion_to_keep = 0.9
+end
 tail = :two
 w0 = 2.2
 
@@ -169,6 +172,7 @@ for i in 1:length(edge_list)
 end
 
 p_val = parse(Float64,Values[5])
+p_val = 1-((1-p_val)/binomial(num_genes,2))
 
 permvec = sortperm(weighted)
 matrix = zeros(Int,num_genes,num_genes)
@@ -202,7 +206,7 @@ for i in 1:length(edge_list)
     weighted[i] = edges[i].weight
 end
 
-p_val = parse(Float64,Values[5])
+# p_val = parse(Float64,Values[5])
 
 permvec = sortperm(weighted)
 matrix = zeros(Int,num_genes,num_genes)
@@ -235,7 +239,7 @@ for i in 1:length(edge_list)
     weighted[i] = edges[i].weight
 end
 
-p_val = parse(Float64,Values[5])
+# p_val = parse(Float64,Values[5])
 
 permvec = sortperm(weighted)
 matrix = zeros(Int,num_genes,num_genes)
@@ -268,7 +272,7 @@ for i in 1:length(edge_list)
     weighted[i] = edges[i].weight
 end
 
-p_val = parse(Float64,Values[5])
+# p_val = parse(Float64,Values[5])
 
 permvec = sortperm(weighted)
 matrix = zeros(Int,num_genes,num_genes)

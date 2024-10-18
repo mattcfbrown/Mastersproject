@@ -157,21 +157,33 @@ test = pd.DataFrame({
     'Multi = 100': MCC_100
 })
 test = pd.melt(test, ['Inference method'])
+means = test.groupby("variable")["value"].mean()
+means = [means[i] for i in [3,0,1,2]]
+print(means)
+
 sns.set_theme(rc={'figure.figsize':(11.7,8.27)},style="whitegrid")
 ax = sns.boxplot(x='variable', y='value', data = test,showfliers=False,
-                 hue = 'variable',fill=False,linewidth=2
+                 hue = 'variable',fill=False,linewidth=2,
+                 color='black',
+                 showmeans=True,
+                 meanprops={
+                     'marker': 'o',
+                     'markerfacecolor': 'red',
+                     'markeredgecolor':'black'
+                 }
                  ) 
 ax.grid(False)
 sns.stripplot(x='variable', y='value', data = test, ax=ax, hue = 'Inference method')
-# for xtick in ax.get_xticks():
-#     ax.text(xtick,round(means[xtick],4) - 0.01,round(means[xtick],4), 
-#             horizontalalignment='center',size='x-small',color='red',weight='semibold')
+height = [-0.02]*4
+for xtick in ax.get_xticks():
+    ax.text(xtick,round(means[xtick],4) + height[xtick],round(means[xtick],4), 
+            horizontalalignment='center',size='x-small',color='black',weight='semibold')
 plt.legend(title="Inference methods")
 sns.move_legend(ax, "upper left", bbox_to_anchor=(1, 1))
 plt.xlabel('multi',fontsize=15)
-plt.ylabel("Matthew's correlation coefficient scores",fontsize=15)
-plt.title("MCC scores of various techniques using different 'multi' values",
-          fontsize = 20)
+plt.ylabel("MCC score",fontsize=15)
+# plt.title("MCC scores of various techniques using different 'multi' values",
+#           fontsize = 20)
 plt.xticks(fontsize=10)
 plt.yticks(fontsize=10)
 plt.tight_layout()

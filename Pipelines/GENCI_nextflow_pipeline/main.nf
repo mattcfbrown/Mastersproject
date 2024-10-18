@@ -16,17 +16,17 @@ workflow{
     //(ID, outputs of the grn, optimised ensemble network, input file, ground truth)
 
     //Get the optimised directory
-    // def optimised = channel.of(file("./Data/optimised/").listFiles())
-    def optimised = channel.of(file("./Data/BEELINE/optimised_beeline/").listFiles())
+    def optimised = channel.of(file("./Data/optimised/").listFiles())
+    // def optimised = channel.of(file("./Data/BEELINE/optimised_beeline/").listFiles())
     //Get the output directory
-    // def grn = channel.of(file("./Data/outputs/").listFiles())
-    def grn = channel.of(file("./Data/BEELINE/outputs_beeline/").listFiles())
+    def grn = channel.of(file("./Data/outputs/").listFiles())
+    // def grn = channel.of(file("./Data/BEELINE/outputs_beeline/").listFiles())
     //Get the ground truth networks
-    // def groundtruth = Channel.fromPath( "./Data/ground_truth/*.csv" )
-    def groundtruth = Channel.fromPath( "./Data/BEELINE/truth1.csv" )
+    def groundtruth = Channel.fromPath( "./Data/ground_truth/*.csv" )
+    // def groundtruth = Channel.fromPath( "./Data/BEELINE/truth1.csv" )
     //Get the inputs
-    // def inputs = Channel.fromPath("./Data/Files/*.txt")
-    def inputs = Channel.fromPath("./Data/BEELINE/Files/*.txt")
+    def inputs = Channel.fromPath("./Data/Files/*.txt")
+    // def inputs = Channel.fromPath("./Data/BEELINE/Files/*.txt")
     
     
     // //Credit to this:
@@ -40,14 +40,14 @@ workflow{
     inputs
         .map { [it.toString().split('data_')[1].split('.txt')[0], it] }
         .set { input_key }
-    // groundtruth
-    //     .map { [it.toString().split('truth_')[1].split('.csv')[0], it] }
-    //     .set { truth_key }
+    groundtruth
+        .map { [it.toString().split('truth_')[1].split('.csv')[0], it] }
+        .set { truth_key }
     ch_inputs = grn_key
         .combine(optimised_key, by: 0)
         .combine(input_key, by: 0)
-        // .combine(truth_key, by: 0)
-        .combine(groundtruth)
+        .combine(truth_key, by: 0)
+        // .combine(groundtruth)
     //Step 2: The data needs to be put into the acceptable EB format
     //This will return:
     //(ID, outputs of the grn, optimised ensemble network, EB input, original_input, ground truth)
@@ -62,7 +62,7 @@ workflow{
     //(ID, outputs of the grn, optimised ensemble network, EB input, Eb boot, ground truth)
     boot_output_ch = BOOTSTRAPPING(
         bootstrap,
-        0.9,
+        0.95,
         eb_input_ch
     )
 
@@ -72,7 +72,7 @@ workflow{
     //(ID, outputs of the grn, optimised ensemble network, ground truth, EB boot,EB full output, EB top 10 output)
     eb_output = EB_RUN(
         eb_geneci,
-        0.9,
+        0.95,
         boot_output_ch
     )
 
@@ -208,7 +208,7 @@ process EB_RUN {
 process METRICS {
 
     container 'metrics:latest'
-    publishDir "${params.outdir}/metrics/Beeline"
+    publishDir "${params.outdir}/metrics"
 
     input:
     path script

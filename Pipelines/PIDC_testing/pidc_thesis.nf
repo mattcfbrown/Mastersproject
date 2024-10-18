@@ -14,17 +14,18 @@ workflow{
     //Contains (ID, input, groundtruth, zeroed)
 
     //The ground truth network
-    // def groundtruth_no = Channel.fromPath( "./Data/Original_test.csv" )
-    def groundtruth_no = Channel.fromPath( "../../Directed_groundtruth/truth_beeline.csv" )
+    def groundtruth_no = Channel.fromPath( "./Data/Original_test.csv" )
+    // def groundtruth_no = Channel.fromPath( "../../Directed_groundtruth/truth_beeline.csv" )
     //The inputs
-    // def input_expressions_no = Channel.fromPath( "../Empirical_Bayes_testing/Data/25genes_*.txt" )
-    def input_expressions_no = Channel.fromPath( "../GENCI_nextflow_pipeline/Data/BEELINE/Files/data_*.txt" )
-    def zero_prior = Channel.fromPath("../../Directed_groundtruth/zeroed_beeline.csv")
-    // def zero_prior = Channel.fromPath("./Data/zeroed.csv")
+    def input_expressions_no = Channel.fromPath( "../Empirical_Bayes_testing/Data/25genes_*.txt" )
+    // def input_expressions_no = Channel.fromPath( "../GENCI_nextflow_pipeline/Data/BEELINE/Files/data_*.txt" )
+    // def zero_prior = Channel.fromPath("../../Directed_groundtruth/zeroed_beeline.csv")
+    def zero_prior = Channel.fromPath("./Data/zeroed.csv")
     //Credit to this:
     //https://nextflow-io.github.io/patterns/create-key-to-combine-channels/
     input_expressions_no
-        .map { [it.toString().split('data_')[1].split('.txt')[0], it] }
+        // .map { [it.toString().split('data_')[1].split('.txt')[0], it] }
+        .map { [it.toString().split('25genes_')[1].split('.txt')[0], it] }
         .set { input_key_no }
     no_prior_inputs = input_key_no
         .combine(groundtruth_no)
@@ -70,7 +71,7 @@ workflow{
 
     output_ch = EB_RUN(
         pidc_eb,
-        0.75,
+        0.9998333333,
         convert_ch
     )
 

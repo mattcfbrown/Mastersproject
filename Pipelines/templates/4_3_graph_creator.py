@@ -179,6 +179,7 @@ print(means)
 sns.set_theme(rc={'figure.figsize':(11.7,8.27)},style="whitegrid")
 ax = sns.boxplot(x='variable', y='value', data = test,showfliers=False,
                  hue = 'variable',fill=False,linewidth=2,
+                 color = 'black',
                  showmeans=True,
                  meanprops={
                      'marker': 'o',
@@ -188,14 +189,14 @@ ax = sns.boxplot(x='variable', y='value', data = test,showfliers=False,
 ax.grid(False)
 sns.stripplot(x='variable', y='value', data = test, ax=ax, hue = 'Inference method')
 for xtick in ax.get_xticks():
-    ax.text(xtick,round(means[xtick],4) - 0.01,round(means[xtick],4), 
+    ax.text(xtick,round(means[xtick],4) - 0.015,round(means[xtick],4), 
             horizontalalignment='center',size='x-small',color='red',weight='semibold')
 plt.legend(title="Inference methods")
 sns.move_legend(ax, "upper left", bbox_to_anchor=(1, 1))
 plt.xlabel(r'$\omega^{0}$',fontsize=15)
-plt.ylabel("Matthew's correlation coefficient scores",fontsize=15)
-plt.title("MCC scores of various techniques using different " + r'$\omega^{0}$' + " values",
-          fontsize = 20)
+plt.ylabel("MCC score",fontsize=15)
+# plt.title("MCC scores of various techniques using different " + r'$\omega^{0}$' + " values",
+#           fontsize = 20)
 plt.xticks(fontsize=10)
 plt.yticks(fontsize=10)
 plt.tight_layout()

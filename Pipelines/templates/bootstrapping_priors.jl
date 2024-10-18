@@ -83,7 +83,7 @@ function EB_running(data_matrix,sample_num,prior_matrix,zero_matrix,p_val)
 
     #From here we will be analysing the Posterior calculation
     null_pdf(x) = pdf(null_distr, x)
-    multi = 10
+    multi = 1
 
     function prior_fn(x) 
         if x == 0
@@ -137,6 +137,7 @@ function EB_running(data_matrix,sample_num,prior_matrix,zero_matrix,p_val)
     end
 
     p_val = p_val
+    p_val = 1-((1-p_val)/binomial(num_genes,2))
 
     permvec = sortperm(weighted)
     matrix_priors = zeros(Int,num_genes,num_genes)
@@ -167,6 +168,7 @@ function EB_running(data_matrix,sample_num,prior_matrix,zero_matrix,p_val)
     end
 
     p_val = p_val
+    p_val = 1-((1-p_val)/binomial(num_genes,2))
 
     permvec = sortperm(weighted)
     matrix_zero = zeros(Int,num_genes,num_genes)
@@ -222,7 +224,7 @@ zero_values = Matrix{Int64}[]
 N = 50
 p_val = parse(Float64,Values[3])
 Threads.@threads for i = 1:N  
-    matrix_priors, matrix_zeros = EB_running(data_matrix,i,prior_matrix,zero_matrix,0.9)
+    matrix_priors, matrix_zeros = EB_running(data_matrix,i,prior_matrix,zero_matrix,0.95)
     push!(prior_values,matrix_priors)
     push!(zero_values,matrix_zeros)
 end

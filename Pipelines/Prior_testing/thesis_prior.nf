@@ -18,18 +18,18 @@ workflow{
     //(ID, Datafile, ground truth, zeroed)
 
     //The ground truth network
-    def groundtruth_no = Channel.fromPath( "./Data/Original_test.csv" )
-    // def groundtruth_no = Channel.fromPath("../../Directed_groundtruth/truth_beeline.csv")
+    // def groundtruth_no = Channel.fromPath( "./Data/Original_test.csv" )
+    def groundtruth_no = Channel.fromPath("../../Directed_groundtruth/truth_beeline.csv")
     //The inputs
-    def input_expressions_no = Channel.fromPath( "./Data/25genes_*.txt" )
-    // def input_expressions_no = Channel.fromPath("../GENCI_nextflow_pipeline/Data/BEELINE/Files/data_*.txt")
-    // def zero_prior = Channel.fromPath("../../Directed_groundtruth/zeroed_beeline.csv")
-    def zero_prior = Channel.fromPath("../PIDC_testing/Data/zeroed.csv")
+    // def input_expressions_no = Channel.fromPath( "./Data/25genes_*.txt" )
+    def input_expressions_no = Channel.fromPath("../GENCI_nextflow_pipeline/Data/BEELINE/Files/data_*.txt")
+    def zero_prior = Channel.fromPath("../../Directed_groundtruth/zeroed_beeline.csv")
+    // def zero_prior = Channel.fromPath("../PIDC_testing/Data/zeroed.csv")
     //Credit to this:
     //https://nextflow-io.github.io/patterns/create-key-to-combine-channels/
     input_expressions_no
-        // .map { [it.toString().split('data_')[1].split('.txt')[0], it] }
-        .map { [it.toString().split('25genes_')[1].split('.txt')[0], it] }
+        .map { [it.toString().split('data_')[1].split('.txt')[0], it] }
+        // .map { [it.toString().split('25genes_')[1].split('.txt')[0], it] }
         .set { input_key_no }
     inputs_ch = input_key_no
         .combine(groundtruth_no)
@@ -69,17 +69,17 @@ workflow{
     //Step 6: Add the different values to the channels
     //Returns
     //(ID, EB normalised, ground truth, zeroed, normalised GENIE output, w0)
-    // def multi = Channel.of(1,10,100)
+    def multi = Channel.of(1,10,100)
     // def multi = Channel.of(5)
-    def pi0 = Channel.of(2.2,2.944)
+    // def pi0 = Channel.of(2.2,2.944)
     pi0_ch = eb_readable_ch
-        .combine(pi0)
-        // .combine(multi)
+        // .combine(pi0)
+        .combine(multi)
     //Step 7: Work with EB
     eb_ch = EB_RUN(
-        eb_prior,
-        // thresh_thesis,
-        0.75,
+        // eb_prior,
+        thresh_thesis,
+        0.9990909091,
         pi0_ch
     )
 
@@ -203,7 +203,7 @@ process EB_RUN {
 process METRICS{
 
     container 'metrics:latest'
-    publishDir "${params.outdir}/thesis/metrics/SERGIO"
+    publishDir "${params.outdir}/thesis/metrics/BEELINE/multi"
 
     input:
     path script 

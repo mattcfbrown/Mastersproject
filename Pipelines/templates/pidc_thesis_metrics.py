@@ -27,7 +27,7 @@ print(num_genes)
 
 #With genie3, we need to make it so that the 0s and 1s are there
 min_val = sorted([x for row in genie3 for x in row],reverse=True)
-min_val = min_val[round(num_genes*num_genes*0.05)]
+min_val = min_val[round(num_genes*num_genes*0.1)]
 for i in range(num_genes):
     for j in range(num_genes):
         if genie3[i][j] >= min_val or genie3[j][i] == 1:
